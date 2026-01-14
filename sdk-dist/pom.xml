@@ -10,12 +10,17 @@
     </parent>
 
     <packaging>pom</packaging>
-    <artifactId>distribution</artifactId>
+    <artifactId>sdk-dist</artifactId>
 
     <dependencies>
         <dependency>
+            <groupId>ru.slie.luna</groupId>
+            <artifactId>luna-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sdk</artifactId>
+            <artifactId>sdk-cli</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -8,8 +8,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>sdk</module>
-    <module>distribution</module>
+    <module>sdk-cli</module>
+    <module>sdk-dist</module>
   </modules>
 
   <properties>

@@ -2,6 +2,8 @@ package ru.slie.luna.sdk.project;
 
 import org.apache.maven.model.*;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class ProjectBuilder {
     private String localRepository;
     private final ResourceBundle bundle = ResourceBundle.getBundle("messages");
     private final String projectDir;
+    private final Logger log = LoggerFactory.getLogger("luna-sdk");
 
     public ProjectBuilder(String projectDir) {
         this.projectDir = projectDir;
@@ -51,6 +54,11 @@ public class ProjectBuilder {
         model.setVersion(version);
         model.setPackaging("jar");
         model.setName("Luna addon: " + groupId + ":" + artifactId);
+
+        Organization organization = new Organization();
+        organization.setName("Example company");
+        organization.setUrl("https://example.com");
+        model.setOrganization(organization);
 
         Dependency lunaApiDep = new Dependency();
         lunaApiDep.setGroupId("ru.slie.luna");
@@ -113,6 +121,6 @@ public class ProjectBuilder {
             throw new RuntimeException(e);
         }
 
-        System.out.println(bundle.getString("command.generate.project.success"));
+        log.info(bundle.getString("command.generate.project.success"));
     }
 }

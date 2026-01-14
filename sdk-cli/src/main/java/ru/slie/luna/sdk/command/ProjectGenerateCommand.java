@@ -1,5 +1,7 @@
 package ru.slie.luna.sdk.command;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import ru.slie.luna.sdk.project.ProjectBuilder;
 
@@ -8,7 +10,8 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 
 @CommandLine.Command(name = "generate", description = "${command.generate.description}", mixinStandardHelpOptions = true)
-public class GenerateProjectCommand implements Runnable {
+public class ProjectGenerateCommand implements Runnable {
+    private final Logger log = LoggerFactory.getLogger("luna-sdk");
     ResourceBundle bundle = ResourceBundle.getBundle("messages");
 
     @CommandLine.Option(names = {"-g", "--groupId"}, descriptionKey = "command.generate.option.group_id")
@@ -25,7 +28,8 @@ public class GenerateProjectCommand implements Runnable {
 
     private final Scanner scanner = new Scanner(System.in);
 
-    @Override public void run() {
+    @Override
+    public void run() {
         if (groupId == null || artifactId == null) {
             enterInteractiveMode();
         }
@@ -36,12 +40,12 @@ public class GenerateProjectCommand implements Runnable {
             projectDir = currentDirPath;
         }
 
-        System.out.println(bundle.getString("command.generate.project_summary"));
-        System.out.println("   groupId: " + groupId);
-        System.out.println("   artifactId: " + artifactId);
-        System.out.println("   version: " + version);
-        System.out.println("   directory: " + projectDir);
-        System.out.println();
+        log.info(bundle.getString("command.generate.project_summary"));
+        log.info("   groupId: {}", groupId);
+        log.info("   artifactId: {}", artifactId);
+        log.info("   version: {}", version);
+        log.info("   directory: {}", projectDir);
+        log.info("\n");
 
         ProjectBuilder builder = new ProjectBuilder(projectDir);
         builder.groupId(groupId);
@@ -72,7 +76,7 @@ public class GenerateProjectCommand implements Runnable {
             defaultStr = " [" + currentValue + "]";
         }
 
-        System.out.print(question + defaultStr + ": ");
+        log.info("{}{}: ", question, defaultStr);
         String input = scanner.nextLine().trim();
 
         if (input.isEmpty()) {
