@@ -18,20 +18,53 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Path;
 
 public class CustomZipURLInstaller extends ZipURLInstaller {
     private final Logger log = LoggerFactory.getLogger("installer");
     private final I18nResolver i18n = new I18nResolver();
+    private final String extractDir;
 
-    public CustomZipURLInstaller(URL remoteLocation, String downloadDir, String extractDir) {
-        super(remoteLocation, downloadDir, extractDir);
+    public CustomZipURLInstaller(URL remoteLocation, Path targetDir) {
+        super(remoteLocation, targetDir.resolve("downloads").toString(), targetDir.toString());
+        this.extractDir = targetDir.toString();
+    }
+
+    @Override
+    public String getExtractDir() {
+        if (extractDir == null) {
+            return super.getExtractDir();
+        }
+
+        return extractDir;
+    }
+
+    @Override
+    public String getHome() {
+        if (!this.isAlreadyExtracted()) {
+            throw new ContainerException("Failed to get container installation home as the container has not yet been installed. Please call install() first.");
+        } else {
+            String name = this.getSourceFileName();
+            int dotPos = name.lastIndexOf(".");
+            if (dotPos > -1) {
+                name = name.substring(0, dotPos);
+            }
+
+            if (name.endsWith(".tar")) {
+                name = name.substring(0, name.length() - 4);
+            }
+
+            return Path.of(extractDir).resolve(name).toString();
+        }
     }
 
     private void unpack() throws Exception {
         String source = this.getFileHandler().append(this.getDownloadDir(), this.getSourceFileName());
-        this.getLogger().info("Installing container [" + source + "] in [" + this.getExtractDir() + "]", this.getClass().getName());
+        log.info(i18n.getString("cargo.installer.container_installing", source, this.getExtractDir()));
         if (source.endsWith(".7z")) {
-            SevenZFile sevenZFile = new SevenZFile(new File(source));
+            SevenZFile.Builder builder = SevenZFile.builder();
+            builder.setFile(new File(source));
+            SevenZFile sevenZFile = builder.get();
 
             SevenZArchiveEntry sevenZEntry;
             while((sevenZEntry = sevenZFile.getNextEntry()) != null) {
@@ -119,11 +152,11 @@ public class CustomZipURLInstaller extends ZipURLInstaller {
 
     private void unpackStream(InputStream sourceInputStream) throws Exception {
         ArchiveStreamFactory asf = new ArchiveStreamFactory();
-        ArchiveInputStream dearchivedInputStream = asf.createArchiveInputStream(sourceInputStream);
+        ArchiveInputStream<?> unpackedInputStream = asf.createArchiveInputStream(sourceInputStream);
 
         ArchiveEntry archiveEntry;
         try {
-            while((archiveEntry = dearchivedInputStream.getNextEntry()) != null) {
+            while((archiveEntry = unpackedInputStream.getNextEntry()) != null) {
                 String destinationEntry = this.getFileHandler().append(this.getExtractDir(), DefaultFileHandler.sanitizeFilename(archiveEntry.getName(), this.getLogger()));
                 if (archiveEntry.isDirectory()) {
                     this.getFileHandler().mkdirs(destinationEntry);
@@ -136,7 +169,7 @@ public class CustomZipURLInstaller extends ZipURLInstaller {
                     OutputStream destinationFileOutputStream = this.getFileHandler().getOutputStream(destinationEntry);
 
                     try {
-                        this.getFileHandler().copy(dearchivedInputStream, destinationFileOutputStream);
+                        this.getFileHandler().copy(unpackedInputStream, destinationFileOutputStream);
                     } catch (Throwable var12) {
                         if (destinationFileOutputStream != null) {
                             try {
@@ -155,9 +188,9 @@ public class CustomZipURLInstaller extends ZipURLInstaller {
                 }
             }
         } catch (Throwable var13) {
-            if (dearchivedInputStream != null) {
+            if (unpackedInputStream != null) {
                 try {
-                    dearchivedInputStream.close();
+                    unpackedInputStream.close();
                 } catch (Throwable var10) {
                     var13.addSuppressed(var10);
                 }
@@ -166,10 +199,7 @@ public class CustomZipURLInstaller extends ZipURLInstaller {
             throw var13;
         }
 
-        if (dearchivedInputStream != null) {
-            dearchivedInputStream.close();
-        }
-
+        unpackedInputStream.close();
     }
 
     @Override
@@ -178,32 +208,31 @@ public class CustomZipURLInstaller extends ZipURLInstaller {
             log.info(i18n.getString("cargo.installer.container_not_installed", this.getSourceFileName()));
             String targetFile = this.getFileHandler().append(this.getDownloadDir(), this.getSourceFileName());
             if (this.getFileHandler().isDirectory(targetFile)) {
-                throw new ContainerException("Target file [" + targetFile + "] already exists as a directory, either delete it or change the ZipURLInstaller target folder or file name");
+                throw new ContainerException(i18n.getString("cargo.installer.file_already_exists_as_directory", targetFile));
             }
 
             if (!this.getFileHandler().exists(targetFile)) {
-                this.getLogger().debug("Container [" + this.getSourceFileName() + "] is not yet downloaded.", this.getClass().getName());
+                log.debug(i18n.getString("cargo.installer.container_is_not_yet_downloaded", this.getSourceFileName()));
                 this.download();
             }
 
             try {
-                this.getLogger().debug("Container [" + this.getSourceFileName() + "] is downloaded, now unpacking.", this.getClass().getName());
+                log.info(i18n.getString("cargo.installer.container_is_downloaded_unpacking", this.getSourceFileName()));
                 this.unpack();
             } catch (Exception var5) {
-                this.getLogger().debug("Container [" + this.getSourceFileName() + "] is broken.", this.getClass().getName());
+                log.warn(i18n.getString("cargo.installer.container_is_broken", this.getSourceFileName()));
                 this.getFileHandler().delete(targetFile);
                 this.download();
 
                 try {
-                    this.getLogger().debug("As the container was broken, also deleting [" + this.getExtractDir() + "] before extraction.", this.getClass().getName());
+                    log.info(i18n.getString("cargo.installer.container_as_broken_also_deleting", this.getExtractDir()));
                     this.getFileHandler().delete(this.getExtractDir());
                     this.unpack();
                 } catch (Exception ee) {
                     throw new ContainerException("Failed to unpack [" + this.getSourceFileName() + "]", ee);
                 }
             }
-
-            this.getLogger().debug("Container [" + this.getSourceFileName() + "] is unpacked, now registering.", this.getClass().getName());
+            log.info(i18n.getString("cargo.installer.container_is_unpacking", this.getSourceFileName()));
             this.registerInstallation();
         } else {
             log.info(i18n.getString("cargo.installer.container_already_installed", this.getSourceFileName()));
