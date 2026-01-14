@@ -5,27 +5,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import ru.slie.luna.sdk.utils.CargoUtils;
+import ru.slie.luna.sdk.utils.I18nResolver;
 import ru.slie.luna.sdk.utils.ProjectUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
 
-@CommandLine.Command(name = "run", description = "Запустить Tomcat с приложением и плагином")
+@CommandLine.Command(name = "run", description = "${command.run.description}")
 public class RunCommand implements Runnable {
-    ResourceBundle bundle = ResourceBundle.getBundle("messages");
+    private final I18nResolver i18n = new I18nResolver();
     private final Logger log = LoggerFactory.getLogger("luna-sdk");
 
     @Override public void run() {
         Path currentDirPath = Paths.get("").toAbsolutePath();
         new ProjectUtils().checkProjectRoot(currentDirPath);
-        Path runnerPom = Path.of(System.getProperty("luna.sdk.home")).resolve("runner").resolve("pom.xml");
-        if (!Files.isRegularFile(runnerPom)) {
+        Path sdkHome = Path.of(System.getProperty("luna.sdk.home"));
+        if (!Files.isDirectory(sdkHome)) {
             throw new RuntimeException();
         }
+
+        log.info(i18n.getString("command.run.cargo.prepare_run"));
 
         String hostDataBasePath = currentDirPath.resolve("target").resolve("mongo").toAbsolutePath().toString();
         Path lunaHome = currentDirPath.resolve("target").resolve("luna-home").toAbsolutePath();
@@ -38,26 +39,43 @@ public class RunCommand implements Runnable {
 //        try (MongoDBContainer mongo = new MongoDBContainer("mongo:8")
 //                                                         .withReuse(true)
 //                                                         .withFileSystemBind(hostDataBasePath, "/data/db", BindMode.READ_WRITE)) {
-
-            //mongo.start();
+//
+//            mongo.start();
 //            String uri = mongo.getReplicaSetUrl("luna");
 //            String database = "luna";
-
+//
 //            try {
-//                Files.writeString(lunaHome.resolve("database.yml"), String.format("url: %s\ndatabase: %s", uri, database));
+//                Files.writeString(lunaHome.resolve("database.yml"), String.format("uri: %s\ndatabase: %s", uri, database));
 //            } catch (IOException e) {
 //                throw new RuntimeException(e);
 //            }
 
-            log.info("{}", bundle.getString("command.run.cargo.run"));
+            log.info(i18n.getString("command.run.cargo.run"));
 
-        try {
-            InstalledLocalContainer container = CargoUtils.makeContainer(currentDirPath.resolve("target").toAbsolutePath());
-            container.start();
-        } catch (MalformedURLException e) {
-            log.error("failed to start");
-            throw new RuntimeException(e);
-        }
+            try {
+                Path warPath = sdkHome.resolve("repository/ru/slie/luna/luna-web/1.0.0/luna-web-1.0.0.war");
+
+                InstalledLocalContainer container = CargoUtils.makeContainer(currentDirPath.resolve("target").toAbsolutePath(), warPath.toAbsolutePath());
+                container.start();
+
+                log.info(i18n.getString("command.run.cargo.tomcat_started", " http://localhost:7080"));
+
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        log.info(i18n.getString("command.run.cargo.tomcat_stopping"));
+                        container.stop();
+                        log.info(i18n.getString("command.run.cargo.tomcat_stopped"));
+                    } catch (Exception e) {
+                        log.error(i18n.getString("command.run.cargo.tomcat_stopping_error"), e);
+                    }
+                }));
+
+                Thread.currentThread().join();
+
+            } catch (Exception e) {
+                log.error(i18n.getString("command.run.cargo.failed_to_start"));
+                throw new RuntimeException(e);
+            }
         //}
     }
 }
