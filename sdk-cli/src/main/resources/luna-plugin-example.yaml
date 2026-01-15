@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json
+
+key: "${project.groupId}.${project.artifactId}"
+name: "${project.name}"
+version: "${project.version}"
+description: "${project.description}"
+vendor:
+  name: "${project.organization.name}"
+  url: "${project.organization.url}"
+components:
+  - key: "HelloWorldRest"
+    name: "Test rest controller"
+    className: "ru.slie.luna.demo.HelloWorldRest"

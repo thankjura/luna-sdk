@@ -49,11 +49,11 @@ public class DemoFiles {
 
 
 
-        try (InputStream stream = getClass().getResourceAsStream("/luna-plugin-example.json")) {
+        try (InputStream stream = getClass().getResourceAsStream("/luna-plugin-example.yaml")) {
             if (stream != null) {
                 String content = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
                 content = content.replaceAll(DEMO_PACKAGE, targetPackage);
-                Files.writeString(resourceDir.resolve("luna-plugin.json"), content, StandardCharsets.UTF_8);
+                Files.writeString(resourceDir.resolve("luna-plugin.yaml"), content, StandardCharsets.UTF_8);
             }
         }
     }
