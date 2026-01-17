@@ -15,11 +15,6 @@
     <dependencies>
         <dependency>
             <groupId>ru.slie.luna</groupId>
-            <artifactId>luna-api</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>ru.slie.luna</groupId>
             <artifactId>luna-web</artifactId>
             <version>1.0.0</version>
             <type>war</type>
@@ -72,6 +67,7 @@
                         <configuration>
                             <useRepositoryLayout>true</useRepositoryLayout>
                             <copyPom>true</copyPom>
+                            <excludeArtifactIds>sdk-cli</excludeArtifactIds>
                             <outputDirectory>${dist.repo.target}</outputDirectory>
                             <includeGroupIds>ru.slie.luna</includeGroupIds>
                         </configuration>

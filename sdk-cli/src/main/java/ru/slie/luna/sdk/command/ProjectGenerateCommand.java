@@ -45,17 +45,11 @@ public class ProjectGenerateCommand implements Runnable {
         log.info("   artifactId: {}", artifactId);
         log.info("   version: {}", version);
         log.info("   directory: {}", projectDir);
-        log.info("\n");
 
         ProjectBuilder builder = new ProjectBuilder(projectDir);
         builder.groupId(groupId);
         builder.artifactId(artifactId);
         builder.version(version);
-
-        String localRepository = System.getProperty("mnv.repository");
-        if (localRepository != null && !localRepository.isEmpty()) {
-            builder.setLocalRepository(localRepository);
-        }
 
         builder.build();
     }

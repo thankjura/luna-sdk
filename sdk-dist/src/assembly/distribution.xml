@@ -24,9 +24,18 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>../plugin-watcher/target/plugin-watcher-${project.version}-jar-with-dependencies.jar</source>
+            <outputDirectory>plugins</outputDirectory>
+            <destName>watcher-plugin-${project.version}.jar</destName>
+            <fileMode>0644</fileMode>
+        </file>
+    </files>
     <dependencySets>
         <dependencySet>
-            <outputDirectory>lib</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>libs</outputDirectory>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <scope>runtime</scope>
         </dependencySet>

@@ -17,7 +17,6 @@ public class ProjectBuilder {
     private String groupId;
     private String artifactId;
     private String version;
-    private String localRepository;
     private final ResourceBundle bundle = ResourceBundle.getBundle("messages");
     private final String projectDir;
     private final Logger log = LoggerFactory.getLogger("luna-sdk");
@@ -41,11 +40,6 @@ public class ProjectBuilder {
         return this;
     }
 
-    public ProjectBuilder setLocalRepository(String repositoryDir) {
-        localRepository = repositoryDir;
-        return this;
-    }
-
     public void build() {
         Model model = new Model();
         model.setModelVersion("4.0.0");
@@ -63,14 +57,14 @@ public class ProjectBuilder {
         Dependency lunaApiDep = new Dependency();
         lunaApiDep.setGroupId("ru.slie.luna");
         lunaApiDep.setArtifactId("luna-api");
-        lunaApiDep.setVersion("1.0.0");
+        lunaApiDep.setVersion("${luna.api.version}");
         lunaApiDep.setScope("provided");
         model.addDependency(lunaApiDep);
 
         Dependency springDep = new Dependency();
         springDep.setGroupId("org.springframework");
         springDep.setArtifactId("spring-webmvc");
-        springDep.setVersion("6.2.12");
+        springDep.setVersion("7.0.2");
         springDep.setScope("provided");
         model.addDependency(springDep);
 
@@ -87,6 +81,7 @@ public class ProjectBuilder {
 
         model.addProperty("maven.compiler.source", "21");
         model.addProperty("maven.compiler.target", "21");
+        model.addProperty("luna.api.version", "1.0.0");
 
         Path targetDir = Path.of(projectDir).resolve(artifactId).toAbsolutePath();
         if (Files.exists(targetDir)) {
