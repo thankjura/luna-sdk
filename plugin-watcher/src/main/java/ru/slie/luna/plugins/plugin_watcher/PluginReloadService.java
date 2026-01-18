@@ -9,11 +9,11 @@ public class PluginReloadService implements InitializingBean, DisposableBean {
 
     @Override
     public void destroy() throws Exception {
-
+        System.out.println("Пока!");
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        System.out.println("Я тут");
     }
 }
