@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>plugin-watcher</artifactId>
+    <artifactId>quick-reload</artifactId>
 
     <dependencies>
         <dependency>
