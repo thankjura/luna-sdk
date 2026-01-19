@@ -2,8 +2,8 @@ package ru.slie.luna.sdk;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import ru.slie.luna.sdk.command.ProjectGenerateCommand;
 import ru.slie.luna.sdk.command.CompletionCommand;
+import ru.slie.luna.sdk.command.ProjectGenerateCommand;
 import ru.slie.luna.sdk.command.ProjectPackageCommand;
 import ru.slie.luna.sdk.command.RunCommand;
 

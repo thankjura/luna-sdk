@@ -10,6 +10,13 @@
     </parent>
 
     <artifactId>quick-reload</artifactId>
+    <name>Quick reload plugin</name>
+    <description>Watch directory and reload plugin after update</description>
+
+    <organization>
+        <name>Yuriy Oboz</name>
+        <url>mailto:me@slie.ru</url>
+    </organization>
 
     <dependencies>
         <dependency>
@@ -41,6 +48,15 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>luna-plugin.yaml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

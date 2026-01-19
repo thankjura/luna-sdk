@@ -1,4 +1,4 @@
-package ru.slie.luna.plugins.plugin_watcher;
+package ru.slie.luna.plugins.quick_reload;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;

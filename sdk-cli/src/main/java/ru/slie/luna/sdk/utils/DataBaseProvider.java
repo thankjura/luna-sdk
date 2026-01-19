@@ -1,6 +1,5 @@
 package ru.slie.luna.sdk.utils;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
@@ -8,32 +7,55 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class DataBaseContainer implements AutoCloseable {
+public class DataBaseProvider implements AutoCloseable {
     private final MongoDBContainer mongoDBContainer;
-    private final String DATABASE_NAME = "luna";
-    private static final Logger log = LoggerFactory.getLogger("database");
+    private final String databaseName;
+    private final String databaseUri;
+    private static final Pattern URI_PATTERN = Pattern.compile("^(mongodb:(?:\\/{2})?)((\\w+?):(\\w+?)@|:?@?)(\\w+?):(\\d+)\\/(?<database>\\w+)$");
+    private static final I18nResolver i18n = new I18nResolver();
 
-    public DataBaseContainer(Path targetDir, boolean reUse) throws IOException {
-        Path mongoDataDir = targetDir.resolve("database");
-        Files.createDirectories(mongoDataDir);
-        org.apache.logging.log4j.Logger dataBaseLogger = LoggingUtils.getFileLogger("db", targetDir.resolve("database.log").toAbsolutePath().toString(), false);
-        mongoDBContainer = new MongoDBContainer("mongo:8")
-                                   .withReuse(false)
-                                   .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(dataBaseLogger.getName())));
-        mongoDBContainer.start();
+    public DataBaseProvider(Path targetDir, String dbUri) throws IOException, ParseValueException {
+        if (dbUri != null) {
+            mongoDBContainer = null;
+            databaseUri = dbUri;
+            Matcher matcher = URI_PATTERN.matcher(dbUri);
+            if (matcher.find()) {
+                databaseName = matcher.group("database");
+            } else {
+                throw new ParseValueException(i18n.getString("database.provider.parse_uri_error"));
+            }
+        } else {
+            databaseName = "luna";
+            Path mongoDataDir = targetDir.resolve("database");
+            Files.createDirectories(mongoDataDir);
+            org.apache.logging.log4j.Logger dataBaseLogger = LoggingUtils.getFileLogger("db", targetDir.resolve("database.log").toAbsolutePath().toString(), false);
+            mongoDBContainer = new MongoDBContainer("mongo:8")
+                                       .withReuse(false)
+                                       .withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(dataBaseLogger.getName())));
+            mongoDBContainer.start();
+            databaseUri = mongoDBContainer.getConnectionString() + "/?directConnection=true";
+        }
     }
 
     public String getConnectionString() {
-        return mongoDBContainer.getConnectionString() + "/?directConnection=true";
+        return databaseUri;
     }
 
     public String getDataBaseName() {
-        return DATABASE_NAME;
+        return databaseName;
     }
 
     @Override
-    public void close() throws Exception {
-        mongoDBContainer.stop();
+    public void close() {
+        if (mongoDBContainer != null) {
+            mongoDBContainer.stop();
+        }
+    }
+
+    public boolean isContainer() {
+        return mongoDBContainer != null;
     }
 }

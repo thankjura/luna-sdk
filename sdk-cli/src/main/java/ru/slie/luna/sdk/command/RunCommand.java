@@ -3,11 +3,9 @@ package ru.slie.luna.sdk.command;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import picocli.CommandLine;
-import ru.slie.luna.sdk.utils.CargoUtils;
-import ru.slie.luna.sdk.utils.DataBaseContainer;
-import ru.slie.luna.sdk.utils.I18nResolver;
-import ru.slie.luna.sdk.utils.ProjectUtils;
+import ru.slie.luna.sdk.utils.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,8 +20,17 @@ public class RunCommand implements Runnable {
     @CommandLine.Option(names = {"-j", "--jvmargs"}, descriptionKey = "command.run.option.jvmargs")
     private String jvmArgs;
 
-    @CommandLine.Option(names = {"-c", "--reuse"}, descriptionKey = "command.run.option.reuse")
-    private boolean reUse = true;
+    @CommandLine.Option(names = {"-p", "--port"}, descriptionKey = "command.run.option.listen_port")
+    private int port = 7080;
+
+    @CommandLine.Option(names = {"--host"}, descriptionKey = "command.run.option.listen_host")
+    private String host = "localhost";
+
+    @CommandLine.Option(names = {"-d", "--db-uri"}, descriptionKey = "command.run.option.db_uri")
+    private String dbUri;
+
+    @CommandLine.Option(names = {"-a", "--attach"}, descriptionKey = "command.run.option.attach_logs")
+    private Boolean attach = false;
 
     @Override
     public void run() {
@@ -46,9 +53,9 @@ public class RunCommand implements Runnable {
             throw new RuntimeException(e);
         }
 
-        try (DataBaseContainer dataBaseContainer = new DataBaseContainer(targetDir, reUse)) {
-            String uri = dataBaseContainer.getConnectionString();
-            String database = dataBaseContainer.getDataBaseName();
+        try (DataBaseProvider dataBaseProvider = new DataBaseProvider(targetDir, dbUri)) {
+            String uri = dataBaseProvider.getConnectionString();
+            String database = dataBaseProvider.getDataBaseName();
 
             log.info(i18n.getString("command.run.mongo.run", uri));
 
@@ -64,11 +71,17 @@ public class RunCommand implements Runnable {
                 Path warPath = sdkHome.resolve("repository/ru/slie/luna/luna-web/1.0.0/luna-web-1.0.0.war");
                 Path pluginsDir = sdkHome.resolve("plugins");
 
-                InstalledLocalContainer container = CargoUtils.makeContainer(currentDirPath.resolve("target"), pluginsDir, warPath, jvmArgs);
+                InstalledLocalContainer container = CargoUtils.makeContainer(currentDirPath.resolve("target"), pluginsDir, warPath, jvmArgs, host, port);
+
+                if (attach) {
+                    SLF4JBridgeHandler.removeHandlersForRootLogger();
+                    SLF4JBridgeHandler.install();
+                }
+
                 container.start();
                 log.info(container.getHome());
 
-                log.info(i18n.getString("command.run.cargo.tomcat_started", " http://localhost:7080"));
+                log.info(i18n.getString("command.run.cargo.tomcat_started", String.format("http://%s:%s", host, port)));
 
                 Runtime.getRuntime().addShutdownHook(new Thread(() -> {
                     try {
@@ -79,14 +92,15 @@ public class RunCommand implements Runnable {
                         log.error(i18n.getString("command.run.cargo.tomcat_stopping_error"), e);
                     }
 
-                    try {
-                        log.info(i18n.getString("command.run.cargo.database_stopping"));
-                        dataBaseContainer.close();
-                        log.info(i18n.getString("command.run.cargo.database_stopped"));
-                    } catch (Exception e) {
-                        log.error(i18n.getString("command.run.cargo.database_stopping_error"), e);
+                    if (dataBaseProvider.isContainer()) {
+                        try {
+                            log.info(i18n.getString("command.run.cargo.database_stopping"));
+                            dataBaseProvider.close();
+                            log.info(i18n.getString("command.run.cargo.database_stopped"));
+                        } catch (Exception e) {
+                            log.error(i18n.getString("command.run.cargo.database_stopping_error"), e);
+                        }
                     }
-
                 }));
 
                 Thread.currentThread().join();

@@ -26,9 +26,9 @@
     </fileSets>
     <files>
         <file>
-            <source>../plugin-watcher/target/plugin-watcher-${project.version}-jar-with-dependencies.jar</source>
+            <source>../quick-reload/target/quick-reload-${project.version}-jar-with-dependencies.jar</source>
             <outputDirectory>plugins</outputDirectory>
-            <destName>watcher-plugin-${project.version}.jar</destName>
+            <destName>quick-reload-${project.version}.jar</destName>
             <fileMode>0644</fileMode>
         </file>
     </files>

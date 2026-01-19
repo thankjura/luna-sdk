@@ -1,4 +1,4 @@
-package ru.slie.luna.plugins.plugin_watcher;
+package ru.slie.luna.plugins.quick_reload;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

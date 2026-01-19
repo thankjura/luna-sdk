@@ -46,9 +46,6 @@ public class DemoFiles {
             }
         }
 
-
-
-
         try (InputStream stream = getClass().getResourceAsStream("/luna-plugin-example.yaml")) {
             if (stream != null) {
                 String content = new String(stream.readAllBytes(), StandardCharsets.UTF_8);

@@ -4,31 +4,24 @@ import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
+import ru.slie.luna.sdk.utils.I18nResolver;
 import ru.slie.luna.sdk.utils.ProjectUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ResourceBundle;
 
 @CommandLine.Command(name = "package", description = "${command.package.description}", mixinStandardHelpOptions = true)
 public class ProjectPackageCommand implements Runnable {
     private final Logger log = LoggerFactory.getLogger("luna-sdk");
-    ResourceBundle bundle = ResourceBundle.getBundle("messages");
+    private final Logger mavenLog = LoggerFactory.getLogger("maven");
+    I18nResolver i18n = new I18nResolver();
 
     @Override
     public void run() {
+        log.info(i18n.getString("command.package.build"));
         Path currentDirPath = Paths.get("").toAbsolutePath();
         new ProjectUtils().checkProjectRoot(currentDirPath);
-        Path lunaHome = currentDirPath.resolve("luna-home");
-        try {
-            Files.createDirectories(lunaHome);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         Path pomPath = currentDirPath.resolve("pom.xml");
         InvocationRequest request = new DefaultInvocationRequest();
         request.setPomFile(pomPath.toFile());
@@ -36,12 +29,11 @@ public class ProjectPackageCommand implements Runnable {
         if (mavenHome != null) {
             request.setMavenHome(new File(mavenHome));
         }
-
         request.addArg("package");
         request.setBatchMode(true);
         request.setUpdateSnapshots(true);
-        request.setOutputHandler(line -> System.out.println("[Maven] " + line));
-        request.setErrorHandler(line -> System.err.println("[Maven ERROR] " + line));
+        request.setOutputHandler(line -> mavenLog.info("[maven] - {}", line));
+        request.setErrorHandler(line -> mavenLog.error("[maven] - {}", line));
 
         Invoker invoker = new DefaultInvoker();
         try {
@@ -53,6 +45,6 @@ public class ProjectPackageCommand implements Runnable {
             throw new RuntimeException(e);
         }
 
-        log.info(bundle.getString("command.package.build.successful"));
+        log.info(i18n.getString("command.package.build.successful"));
     }
 }

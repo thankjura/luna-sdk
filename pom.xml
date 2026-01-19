@@ -8,7 +8,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>plugin-watcher</module>
+    <module>quick-reload</module>
     <module>sdk-cli</module>
     <module>sdk-dist</module>
   </modules>
