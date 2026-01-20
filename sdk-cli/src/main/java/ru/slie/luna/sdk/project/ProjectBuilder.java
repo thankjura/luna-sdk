@@ -11,7 +11,6 @@ import java.io.Writer;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ProjectBuilder {
@@ -82,7 +81,7 @@ public class ProjectBuilder {
         Resource resource = new Resource();
         resource.setDirectory("src/main/resources");
         resource.setFiltering(true);
-        resource.setIncludes(List.of("luna-plugin.yaml"));
+        //resource.setIncludes(List.of("luna-plugin.yaml"));
         build.addResource(resource);
         model.setBuild(build);
 

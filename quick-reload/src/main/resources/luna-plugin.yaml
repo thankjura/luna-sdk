@@ -6,9 +6,16 @@ version: "${project.version}"
 description: "${project.description}"
 scanPackages:
   - ru.slie.luna.plugins.quick_reload
+
 vendor:
   name: "${project.organization.name}"
   url: "${project.organization.url}"
+
+resources:
+  - name: "I18N messages"
+    path: "quickreload"
+    type: "i18n"
+
 components:
   - key: "PluginReloadService"
     name: "Quick reload plugin service"

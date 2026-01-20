@@ -30,6 +30,7 @@ public class QuickReloadWatcher implements AutoCloseable {
             t.setDaemon(true);
             return t;
         });
+        this.watcherThread.start();
     }
 
     private boolean isFileStable(Path path) throws IOException, InterruptedException {
