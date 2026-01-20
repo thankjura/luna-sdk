@@ -15,14 +15,12 @@ public class PluginWatcher implements AutoCloseable {
     private final WatchService watchService;
     private final Thread watcherThread;
     private final Path targetDirectory;
-    private final String pluginName;
     private final Consumer<Path> onFileChange;
     private final ScheduledExecutorService scheduler;
     private final ConcurrentMap<Path, ScheduledFuture<?>> pendingTasks = new ConcurrentHashMap<>();
 
-    public PluginWatcher(Path targetDirectory, String pluginName, Consumer<Path> onFileChange) throws IOException {
+    public PluginWatcher(Path targetDirectory, Consumer<Path> onFileChange) throws IOException {
         this.targetDirectory = targetDirectory;
-        this.pluginName = pluginName;
         this.onFileChange = onFileChange;
         this.watchService = FileSystems.getDefault().newWatchService();
         this.targetDirectory.register(watchService, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
@@ -47,11 +45,7 @@ public class PluginWatcher implements AutoCloseable {
     }
 
     private boolean isPluginFile(Path jarPath) {
-        if (!jarPath.getFileName().toString().toLowerCase().endsWith(".jar")) {
-            return false;
-        }
-
-        return jarPath.getFileName().startsWith(pluginName);
+        return jarPath.getFileName().toString().toLowerCase().endsWith(".jar");
     }
 
     private void onFileModified(Path file) {
