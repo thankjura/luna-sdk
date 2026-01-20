@@ -9,14 +9,15 @@ import ru.slie.luna.annotations.LunaComponent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 @LunaComponent
-public class PluginReloadService implements InitializingBean, DisposableBean {
-    private final Logger log = LoggerFactory.getLogger(PluginReloadService.class);
-    private volatile PluginWatcher watcher;
-    private final PluginInstaller pluginInstaller;
+public class QuickReloadService implements InitializingBean, DisposableBean {
+    private final Logger log = LoggerFactory.getLogger(QuickReloadService.class);
+    private volatile QuickReloadWatcher watcher;
+    private final QuickReloadInstaller pluginInstaller;
 
-    public PluginReloadService(PluginInstaller pluginInstaller) {
+    public QuickReloadService(QuickReloadInstaller pluginInstaller) {
         this.pluginInstaller = pluginInstaller;
     }
 
@@ -27,9 +28,13 @@ public class PluginReloadService implements InitializingBean, DisposableBean {
         }
     }
 
+    public Optional<QuickReloadWatcher> getWatcher() {
+        return Optional.ofNullable(watcher);
+    }
+
     @Override
     public void afterPropertiesSet() {
-        String pluginDir = System.getProperty("quickrealod.dir");
+        String pluginDir = System.getProperty("quickreload.dir");
         if (pluginDir == null || pluginDir.trim().isEmpty()) {
             return;
         }
@@ -42,7 +47,7 @@ public class PluginReloadService implements InitializingBean, DisposableBean {
         log.info("Start watching plugin dir {}", targetPath);
 
         try {
-            watcher = new PluginWatcher(targetPath, pluginInstaller::installPlugin);
+            watcher = new QuickReloadWatcher(targetPath, pluginInstaller::installPlugin);
         } catch (IOException e) {
             log.error("Failed to start watch directory {}", targetPath, e);
         }

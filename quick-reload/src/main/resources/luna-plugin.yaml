@@ -4,10 +4,16 @@ key: "${project.groupId}.${project.artifactId}"
 name: "${project.name}"
 version: "${project.version}"
 description: "${project.description}"
+scanPackages:
+  - ru.slie.luna.plugins.quick_reload
 vendor:
   name: "${project.organization.name}"
   url: "${project.organization.url}"
 components:
   - key: "PluginReloadService"
     name: "Quick reload plugin service"
-    className: "ru.slie.luna.plugins.quick_reload.PluginReloadService"
+    className: "ru.slie.luna.plugins.quick_reload.QuickReloadService"
+
+  - key: "MonitorRest"
+    name: "Quick reload rest"
+    className: "ru.slie.luna.plugins.quick_reload.rest.MonitorRest"

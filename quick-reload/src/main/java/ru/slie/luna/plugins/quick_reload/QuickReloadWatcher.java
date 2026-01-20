@@ -8,8 +8,8 @@ import java.nio.file.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-public class PluginWatcher implements AutoCloseable {
-    private static final Logger log = LoggerFactory.getLogger(PluginWatcher.class);
+public class QuickReloadWatcher implements AutoCloseable {
+    private static final Logger log = LoggerFactory.getLogger(QuickReloadWatcher.class);
     private static final long DEBOUNCE_TIME_MS = 1000;
 
     private final WatchService watchService;
@@ -19,7 +19,7 @@ public class PluginWatcher implements AutoCloseable {
     private final ScheduledExecutorService scheduler;
     private final ConcurrentMap<Path, ScheduledFuture<?>> pendingTasks = new ConcurrentHashMap<>();
 
-    public PluginWatcher(Path targetDirectory, Consumer<Path> onFileChange) throws IOException {
+    public QuickReloadWatcher(Path targetDirectory, Consumer<Path> onFileChange) throws IOException {
         this.targetDirectory = targetDirectory;
         this.onFileChange = onFileChange;
         this.watchService = FileSystems.getDefault().newWatchService();
@@ -112,5 +112,9 @@ public class PluginWatcher implements AutoCloseable {
         }
 
         log.debug("File watcher stopped watch [{}]", targetDirectory.toAbsolutePath());
+    }
+
+    public String getWatchDirectory() {
+        return targetDirectory.toString();
     }
 }

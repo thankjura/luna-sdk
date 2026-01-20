@@ -36,11 +36,9 @@ public class CargoUtils {
 
         if (jvmArgs == null) {
             jvmArgs = "";
-        } else {
-            jvmArgs += " ";
         }
 
-        jvmArgs += "-Dluna.home=\"" + targetDir.resolve("luna-home") + "\"";
+        jvmArgs = String.format("-Dluna.home=\"%s\" -Dquickrealod.dir=\"%s\" %s", targetDir.resolve("luna-home"), targetDir, jvmArgs);
         configuration.setProperty(GeneralPropertySet.JVMARGS, jvmArgs);
 
         if (Files.isDirectory(pluginsDir)) {
