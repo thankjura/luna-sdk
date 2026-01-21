@@ -1,26 +1,26 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json
 
-key: "${project.groupId}.${project.artifactId}"
-name: "${project.name}"
-version: "${project.version}"
-description: "${project.description}"
+key: ${project.groupId}.${project.artifactId}
+name: ${project.name}
+version: ${project.version}
+description: ${project.description}
 scanPackages:
   - ru.slie.luna.plugins.quick_reload
 
 vendor:
-  name: "${project.organization.name}"
-  url: "${project.organization.url}"
+  name: ${project.organization.name}
+  url: ${project.organization.url}
 
 resources:
-  - name: "I18N messages"
-    path: "quickreload"
-    type: "i18n"
+  - key:  quickreload
+    path: quickreload
+    type: i18n
 
 components:
-  - key: "PluginReloadService"
-    name: "Quick reload plugin service"
-    className: "ru.slie.luna.plugins.quick_reload.QuickReloadService"
+  - key: PluginReloadService
+    name: Quick reload plugin service
+    className: ru.slie.luna.plugins.quick_reload.QuickReloadService
 
-  - key: "MonitorRest"
-    name: "Quick reload rest"
-    className: "ru.slie.luna.plugins.quick_reload.rest.MonitorRest"
+  - key: MonitorRest
+    name: Quick reload rest
+    className: ru.slie.luna.plugins.quick_reload.rest.MonitorRest

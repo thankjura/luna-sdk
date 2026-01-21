@@ -25,7 +25,6 @@ public class MonitorRest {
     @GetMapping({"", "/"})
     public QuickReloadState state() {
         Optional<QuickReloadWatcher> watcher = quickReloadService.getWatcher();
-        String message = i18n.getText("quickreload.hello");
-        return watcher.map(quickReloadWatcher -> new QuickReloadState(quickReloadWatcher.getWatchDirectory(), message)).orElseGet(() -> new QuickReloadState(null, message));
+        return watcher.map(quickReloadWatcher -> new QuickReloadState(quickReloadWatcher.getWatchDirectory())).orElseGet(() -> new QuickReloadState(null));
     }
 }

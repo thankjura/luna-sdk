@@ -22,7 +22,13 @@
         <dependency>
             <groupId>ru.slie.luna</groupId>
             <artifactId>luna-api</artifactId>
-            <version>1.0.0</version>
+            <version>${luna.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ru.slie.luna</groupId>
+            <artifactId>luna-core</artifactId>
+            <version>${luna.version}</version>
             <scope>provided</scope>
         </dependency>
 
