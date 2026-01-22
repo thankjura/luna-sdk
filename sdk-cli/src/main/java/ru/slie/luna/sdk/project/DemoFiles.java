@@ -1,13 +1,16 @@
 package ru.slie.luna.sdk.project;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Collections;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 public class DemoFiles {
@@ -52,6 +55,12 @@ public class DemoFiles {
                 content = content.replaceAll(DEMO_PACKAGE, targetPackage);
                 Files.writeString(resourceDir.resolve("luna-plugin.yaml"), content, StandardCharsets.UTF_8);
             }
+        }
+
+        Properties messages = new Properties();
+        messages.put("app.hello", "Hello plugin");
+        try (OutputStream output = new FileOutputStream(resourceDir.resolve("messages.properties").toFile())) {
+            messages.store(output, "Example message bundle. Create other (ex. messages_ru.properties) in utf-8 and converted to ASCII");
         }
     }
 }
