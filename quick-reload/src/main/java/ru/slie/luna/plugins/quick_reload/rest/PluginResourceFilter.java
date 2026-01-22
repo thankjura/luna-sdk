@@ -26,15 +26,15 @@ public class PluginResourceFilter extends OncePerRequestFilter {
 
     @Override
     @NullMarked
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         String uri = request.getRequestURI();
 
         for (String prefix: resourceMapper.getReplaces().keySet()) {
             if (uri.startsWith(prefix)) {
                 Path path = Path.of(uri.replaceFirst(prefix, resourceMapper.getReplaces().get(prefix).toString()));
-                System.out.println(path);
                 if (!Files.isRegularFile(path)) {
-                    continue;
+                    response.sendError(404);
+                    return;
                 }
 
                 String mime = URLConnection.guessContentTypeFromName(uri);
@@ -49,19 +49,14 @@ public class PluginResourceFilter extends OncePerRequestFilter {
                 File file = path.toFile();
                 response.setContentLengthLong(file.length());
 
-                try (InputStream in = new FileInputStream(file);
-                     OutputStream out = response.getOutputStream()) {
+                try (InputStream in = new FileInputStream(file); OutputStream out = response.getOutputStream()) {
                     byte[] buffer = new byte[4096];
                     int bytesRead;
                     while ((bytesRead = in.read(buffer)) != -1) {
                         out.write(buffer, 0, bytesRead);
                     }
                     out.flush();
-                } catch (IOException ignored) {
-
                 }
-
-
                 return;
             }
         }
