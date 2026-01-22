@@ -17,6 +17,10 @@ resources:
     type: i18n
 
 components:
+  - key: PluginResourceFilter
+    name: Override resources rest endpoints
+    className: ru.slie.luna.plugins.quick_reload.rest.PluginResourceFilter
+
   - key: PluginReloadService
     name: Quick reload plugin service
     className: ru.slie.luna.plugins.quick_reload.QuickReloadService

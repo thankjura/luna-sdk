@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.plugins.quick_reload.models.PluginFile;
+import ru.slie.luna.system.plugin.PluginDescriptor;
+import ru.slie.luna.system.plugin.PluginDescriptorParser;
 import ru.slie.luna.system.plugin.PluginManager;
 
 import java.io.IOException;
@@ -13,9 +15,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,17 +28,27 @@ public class QuickReloadInstaller {
 
     private final I18nResolver i18n;
     private final PluginManager pluginManager;
+    private final PluginDescriptorParser pluginDescriptorParser;
 
-    public QuickReloadInstaller(I18nResolver i18n, PluginManager pluginManager) {
+    public QuickReloadInstaller(I18nResolver i18n,
+                                PluginManager pluginManager,
+                                PluginDescriptorParser pluginDescriptorParser) {
         this.i18n = i18n;
         this.pluginManager = pluginManager;
+        this.pluginDescriptorParser = pluginDescriptorParser;
+    }
+
+    public Optional<PluginDescriptor> getDescriptor(Path pluginPath) {
+        try {
+            return Optional.of(pluginDescriptorParser.getPluginDescriptor(pluginPath));
+        } catch (Exception e) {
+            log.warn(i18n.getText("quickreload.service.failed_read_file", pluginPath.toString()), e);
+        }
+
+        return Optional.empty();
     }
 
     public void installPlugin(Path pluginJar) {
-        if (!getCandidates(pluginJar.getParent()).contains(pluginJar)) {
-            return;
-        }
-
         try (InputStream inputStream = Files.newInputStream(pluginJar)) {
             pluginManager.installPlugin(inputStream);
         } catch (Exception e) {
@@ -44,8 +56,20 @@ public class QuickReloadInstaller {
         }
     }
 
-    public List<Path> getCandidates(Path targetDirectory) {
-        Map<String, List<PluginFile>> pluginsByName = new HashMap<>();
+    public void installPluginIfValid(Path pluginPath, String pluginKey) {
+        Optional<PluginDescriptor> descriptor = getDescriptor(pluginPath);
+        if (descriptor.isEmpty() || !pluginKey.equals(descriptor.get().getKey())) {
+            return;
+        }
+
+        Optional<Path> candidate = getCandidate(pluginPath.getParent());
+        if (candidate.isPresent() && candidate.get().equals(pluginPath)) {
+            installPlugin(pluginPath);
+        }
+    }
+
+    public Optional<Path> getCandidate(Path targetDirectory) {
+        List<PluginFile> plugins = new ArrayList<>();
         log.info(i18n.getText("quickreload.service.start_scan_dir", targetDirectory.toString()));
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(targetDirectory, "*.jar")) {
@@ -56,29 +80,21 @@ public class QuickReloadInstaller {
                     String pluginName = matcher.group(1);
                     String version = matcher.group(2);
                     boolean withDeps = fileName.contains("-jar-with-dependencies");
-
-                    pluginsByName
-                            .computeIfAbsent(pluginName, k -> new ArrayList<>())
-                            .add(new PluginFile(pluginName, version, withDeps, path));
+                    plugins.add(new PluginFile(pluginName, version, withDeps, path));
                 }
             }
         } catch (IOException e) {
             log.error(i18n.getText("quickreload.service.failed_scan_dir", targetDirectory.toString()), e);
-            return List.of();
+            return Optional.empty();
         }
 
-        List<Path> out = new ArrayList<>();
-
-        for (List<PluginFile> candidates : pluginsByName.values()) {
-            if (candidates.isEmpty()) {
-                continue;
-            }
-
-            PluginFile pluginFile = candidates.stream().max(PluginFile::compare).get();
-            log.info(i18n.getText("quickreload.service.fonded_file", pluginFile.path().toString()));
-            out.add(pluginFile.path());
+        if (plugins.isEmpty()) {
+            return Optional.empty();
         }
 
-        return out;
+        Collections.sort(plugins);
+        Path pluginPath = plugins.getLast().path();
+        log.info(i18n.getText("quickreload.service.fonded_file", pluginPath.toString()));
+        return Optional.of(pluginPath);
     }
 }

@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import ru.slie.luna.annotations.LunaComponent;
-import ru.slie.luna.locale.I18nResolver;
+import ru.slie.luna.system.plugin.PluginDescriptor;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 @LunaComponent
@@ -18,12 +18,12 @@ public class QuickReloadService implements InitializingBean, DisposableBean {
     private final Logger log = LoggerFactory.getLogger(QuickReloadService.class);
     private volatile QuickReloadWatcher watcher;
     private final QuickReloadInstaller pluginInstaller;
-    private final I18nResolver i18n;
+    private final ResourceMapper resourceMapper;
 
     public QuickReloadService(QuickReloadInstaller pluginInstaller,
-                              I18nResolver i18n) {
+                              ResourceMapper resourceMapper) {
         this.pluginInstaller = pluginInstaller;
-        this.i18n = i18n;
+        this.resourceMapper = resourceMapper;
     }
 
     @Override
@@ -49,15 +49,38 @@ public class QuickReloadService implements InitializingBean, DisposableBean {
             return;
         }
 
-        List<Path> candidates = pluginInstaller.getCandidates(targetPath);
-        for (Path file: candidates) {
-            pluginInstaller.installPlugin(file);
+        Path pluginDescriptorPath = targetPath.resolve("classes").resolve("luna-plugin.yaml");
+        if (!Files.isRegularFile(pluginDescriptorPath)) {
+            return;
         }
+        YAMLMapper mapper = new YAMLMapper();
+        PluginDescriptor descriptor;
+        try {
+             descriptor = mapper.readValue(pluginDescriptorPath, PluginDescriptor.class);
+        } catch (Exception e) {
+            return;
+        }
+
+        if (descriptor == null) {
+            return;
+        }
+
+        Optional<Path> candidate = pluginInstaller.getCandidate(targetPath);
+        if (candidate.isPresent()) {
+            Optional<PluginDescriptor> candidateDescriptor = pluginInstaller.getDescriptor(candidate.get());
+            if (candidateDescriptor.isPresent() && descriptor.getKey().equals(candidateDescriptor.get().getKey())) {
+                pluginInstaller.installPlugin(candidate.get());
+            }
+        }
+
+        resourceMapper.addReplace("/rest/resources/" + descriptor.getKey(), targetPath.getParent().resolve("src").resolve("main").resolve("resources"));
 
         log.info("Start watching plugin dir {}", targetPath);
 
         try {
-            watcher = new QuickReloadWatcher(targetPath, pluginInstaller::installPlugin);
+            watcher = new QuickReloadWatcher(targetPath, (Path pluginPath) -> {
+                pluginInstaller.installPluginIfValid(pluginPath, descriptor.getKey());
+            });
         } catch (IOException e) {
             log.error("Failed to start watch directory {}", targetPath, e);
         }
