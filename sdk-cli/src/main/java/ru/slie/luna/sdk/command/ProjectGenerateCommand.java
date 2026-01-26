@@ -36,10 +36,8 @@ public class ProjectGenerateCommand implements Runnable {
             enterInteractiveMode();
         }
 
-        String currentDirPath = Paths.get("").toAbsolutePath().toString();
-
         if (projectDir == null) {
-            projectDir = currentDirPath;
+            projectDir = Paths.get("").toAbsolutePath().resolve(artifactId).toString();
         }
 
         log.info(bundle.getString("command.generate.project_summary"));
@@ -62,7 +60,7 @@ public class ProjectGenerateCommand implements Runnable {
         groupId = ask(bundle.getString("command.generate.option.group_id"), groupId, null);
         artifactId = ask(bundle.getString("command.generate.option.artifact_id"), artifactId, "my-addon");
         version = ask(bundle.getString("command.generate.option.version"), version, "1.0.0-SNAPSHOT");
-        String defaultDir = Paths.get("").toAbsolutePath().toString();
+        String defaultDir = Paths.get("").toAbsolutePath().resolve(artifactId).toString();
         projectDir = ask(bundle.getString("command.generate.option.project_dir"), projectDir, defaultDir);
     }
 

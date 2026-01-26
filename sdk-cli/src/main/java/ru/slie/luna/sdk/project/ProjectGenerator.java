@@ -32,7 +32,7 @@ public class ProjectGenerator {
         String content = Files.readString(source);
         if (source.toString().endsWith(".java")) {
             content = content.replaceAll(DEMO_GROUP_ID, targetGroupId);
-        } else if (source.toString().endsWith(".pom")) {
+        } else if (source.toString().endsWith("pom.xml")) {
             content = content.replaceAll(DEMO_GROUP_ID, targetGroupId);
             content = content.replaceAll(DEMO_ARTIFACT_ID, targetArtifactId);
             content = content.replaceAll("<version>1.0.0-SNAPSHOT</version>", "<version>" + targetVersion + "</version>");
