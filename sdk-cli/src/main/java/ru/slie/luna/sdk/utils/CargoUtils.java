@@ -23,7 +23,7 @@ public class CargoUtils {
 
 
     public static InstalledLocalContainer makeContainer(Path targetDir, Path pluginsDir, Path warPath, String jvmArgs, String host, int port) throws IOException {
-        Installer installer = new CustomZipURLInstaller(URI.create("https://dlcdn.apache.org/tomcat/tomcat-11/v11.0.15/bin/apache-tomcat-11.0.15.zip").toURL(), targetDir);
+        Installer installer = new CustomZipURLInstaller(URI.create("https://archive.apache.org/dist/tomcat/tomcat-11/v11.0.18/bin/apache-tomcat-11.0.18.zip").toURL(), targetDir);
         installer.install();
 
         Tomcat11xStandaloneLocalConfiguration configuration = new Tomcat11xStandaloneLocalConfiguration(targetDir.resolve("tomcat-base").toString());

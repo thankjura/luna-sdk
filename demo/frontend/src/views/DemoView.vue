@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { TogglePanel } from 'luna';
+
 
 </script>
 
 <template>
   <div class="demo-page pad">
-    <h3>Demo page</h3>
+    <TogglePanel store-key="demo-panel"></TogglePanel>
   </div>
 </template>
 

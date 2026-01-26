@@ -18,6 +18,7 @@
     "typescript": "~5.9.2",
     "vite": "7.1.11",
     "vue-component-type-helpers": "^3.1.0",
-    "vue-tsc": "^3.1.0"
+    "vue-tsc": "^3.1.0",
+    "vite-plugin-externals": "^0.6.2"
   }
 }
