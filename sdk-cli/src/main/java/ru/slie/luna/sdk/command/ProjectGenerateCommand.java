@@ -1,10 +1,12 @@
 package ru.slie.luna.sdk.command;
 
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
-import ru.slie.luna.sdk.project.ProjectBuilder;
+import ru.slie.luna.sdk.project.ProjectGenerator;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -46,12 +48,14 @@ public class ProjectGenerateCommand implements Runnable {
         log.info("   version: {}", version);
         log.info("   directory: {}", projectDir);
 
-        ProjectBuilder builder = new ProjectBuilder(projectDir);
-        builder.groupId(groupId);
-        builder.artifactId(artifactId);
-        builder.version(version);
+        ProjectGenerator generator = new ProjectGenerator(Path.of(projectDir), new DefaultArtifact(groupId, artifactId, "luna-plugin", version));
+        try {
+            generator.processFiles();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-        builder.build();
+        log.info(bundle.getString("command.generate.project.success"));
     }
 
     private void enterInteractiveMode() {

@@ -11,9 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
-import java.util.stream.Stream;
 
-public class DemoGenerator {
+public class ProjectGenerator {
     private final static String folderPath = "/templates/demo/";
     private final static String DEMO_GROUP_ID = "ru.slie.luna.template";
     private final static String DEMO_ARTIFACT_ID = "demo-addon";
@@ -22,7 +21,7 @@ public class DemoGenerator {
     private final String targetArtifactId;
     private final String targetVersion;
 
-    public DemoGenerator(Path targetDir, Artifact targetArtifact) {
+    public ProjectGenerator(Path targetDir, Artifact targetArtifact) {
         this.targetDir = targetDir;
         this.targetGroupId = targetArtifact.getGroupId();
         this.targetArtifactId = targetArtifact.getArtifactId();
@@ -73,54 +72,5 @@ public class DemoGenerator {
         }
 
         return Path.of(targetDir.toString(), translatedPath);
-    }
-
-    private void processFile(Path sourceFile, Path targetDir, Artifact targetArtifact) throws IOException {
-
-//        if (Files.isRegularFile(sourceFile)) {
-//            String fileName = sourceFile.getFileName().toString();
-//            String content = Files.readString(sourceFile);
-//            content = content.replaceAll(DEMO_GROUP_ID, targetArtifact.getGroupId() + "." + targetArtifact.getArtifactId().replaceAll("-", "_"));
-//            if (fileName.endsWith(".pom")) {
-//                content = content.replaceAll(DEMO_ARTIFACT_ID, targetArtifact.getArtifactId());
-//                content = content.replaceAll("<version>1.0.0-SNAPSHOT</version>", "<version>" + targetArtifact.getVersion() + "</version>");
-//            }
-//            Path targetPath;
-//            if (fileName.endsWith(".java")) {
-//                String directory = targetDir.toString().replaceAll(DEMO_GROUP_ID.replaceAll("\\.", "/"))
-//            } else {
-//                targetPath = targetDir.resolve(fileName);
-//            }
-//
-//            Files.createDirectories(targetDir.resolve(targetPath.getParent()));
-//            //Path targetPath = targetDir.resolve(fileName);
-//            Files.writeString(targetPath, content, StandardCharsets.UTF_8);
-//        } else if (Files.isDirectory(sourceFile)) {
-//            try (Stream<Path> stream = Files.list(sourceFile)) {
-//
-//                for (Path file: stream.toList()) {
-//                    processFile(file, targetDir.resolve(sourceFile.getFileName()), targetArtifact);
-//                }
-//            }
-//        }
-    }
-
-    public void copyDemoFiles(Path targetDir, Artifact artifact) throws URISyntaxException, IOException {
-        URL resource = getClass().getResource(folderPath);
-        if (resource == null) {
-            return;
-        }
-
-        Files.createDirectories(targetDir);
-
-        URI uri = resource.toURI();
-        try (FileSystem ignore = uri.getScheme().equals("jar")? FileSystems.newFileSystem(uri, Collections.emptyMap()): null) {
-            Path dirPath = Paths.get(uri);
-            try (Stream<Path> stream = Files.list(dirPath)) {
-                for (Path file: stream.toList()) {
-                    processFile(file, targetDir, artifact);
-                }
-            }
-        }
     }
 }
