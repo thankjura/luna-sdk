@@ -3,7 +3,7 @@
 key: ${project.groupId}.${project.artifactId}
 name: ${project.name}
 version: ${project.version}
-description: ${project.description}
+description: "${project.description}"
 vendor:
   name: ${project.organization.name}
   url: ${project.organization.url}

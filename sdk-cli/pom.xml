@@ -87,6 +87,36 @@
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>3.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-api</artifactId>
+            <version>${maven.resolver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-impl</artifactId>
+            <version>${maven.resolver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-connector-basic</artifactId>
+            <version>${maven.resolver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-transport-http</artifactId>
+            <version>${maven.resolver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.resolver</groupId>
+            <artifactId>maven-resolver-supplier</artifactId>
+            <version>${maven.resolver.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings-builder</artifactId>
+            <version>3.9.12</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -96,36 +126,24 @@
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
-                <directory>src/main/java/ru/slie/luna/demo</directory>
+                <directory>../demo</directory>
                 <targetPath>templates/demo</targetPath>
-                <includes>
-                    <include>**/*.java</include>
-                </includes>
+                <excludes>
+                    <exclude>target/**</exclude>
+                    <exclude>frontend/node/**</exclude>
+                    <exclude>frontend/node_modules/**</exclude>
+                    <exclude>frontend/dist/**</exclude>
+                    <exclude>frontend/*.tsbuildinfo</exclude>
+                    <exclude>frontend/vite.config.js</exclude>
+                    <exclude>frontend/vite.config.d.ts</exclude>
+                </excludes>
                 <filtering>false</filtering>
             </resource>
         </resources>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.1</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/ru/slie/luna/demo/**/*.java</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <properties>
+        <maven.resolver.version>1.9.25</maven.resolver.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

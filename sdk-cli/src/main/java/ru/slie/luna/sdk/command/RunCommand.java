@@ -1,16 +1,27 @@
 package ru.slie.luna.sdk.command;
 
+import org.apache.maven.model.Model;
 import org.codehaus.cargo.container.InstalledLocalContainer;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import picocli.CommandLine;
-import ru.slie.luna.sdk.utils.*;
+import ru.slie.luna.sdk.utils.CargoUtils;
+import ru.slie.luna.sdk.utils.DataBaseProvider;
+import ru.slie.luna.sdk.utils.I18nResolver;
+import ru.slie.luna.sdk.utils.ProjectUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static ru.slie.luna.sdk.utils.MavenRepositoryHelper.getArtifact;
+import static ru.slie.luna.sdk.utils.ProjectUtils.getModel;
 
 @CommandLine.Command(name = "run", description = "${command.run.description}", mixinStandardHelpOptions = true)
 public class RunCommand implements Runnable {
@@ -46,11 +57,29 @@ public class RunCommand implements Runnable {
 
         Path targetDir = currentDirPath.resolve("target");
         Path lunaHome = currentDirPath.resolve("target").resolve("luna-home").toAbsolutePath();
+        Model model;
+
         try {
             Files.createDirectories(lunaHome);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            model = getModel(currentDirPath);
+        } catch (Exception e) {
+            throw new CommandLine.PicocliException(e.getLocalizedMessage(), e);
         }
+
+        if (!model.getProperties().containsKey("luna.version")) {
+            throw new CommandLine.PicocliException(i18n.getString("command.run.please_define_luna_version"));
+        }
+
+
+        Artifact artifact = new DefaultArtifact("ru.slie.luna", "luna-web", "war", model.getProperties().getProperty("luna.version"));
+        ArtifactResult result;
+
+        try {
+            result = getArtifact(artifact);
+        } catch (ArtifactResolutionException e) {
+            throw new CommandLine.PicocliException(i18n.getString("command.run.failed_to_get_luna", artifact));
+        }
+        Path warPath = result.getArtifact().getFile().toPath();
 
         try (DataBaseProvider dataBaseProvider = new DataBaseProvider(targetDir, dbUri)) {
             String uri = dataBaseProvider.getConnectionString();
@@ -67,7 +96,6 @@ public class RunCommand implements Runnable {
             log.info(i18n.getString("command.run.cargo.run"));
 
             try {
-                Path warPath = sdkHome.resolve("repository/ru/slie/luna/luna-web/1.0.0/luna-web-1.0.0.war");
                 Path pluginsDir = sdkHome.resolve("plugins");
 
                 InstalledLocalContainer container = CargoUtils.makeContainer(currentDirPath.resolve("target"), pluginsDir, warPath, jvmArgs, host, port);
@@ -106,10 +134,10 @@ public class RunCommand implements Runnable {
 
             } catch (Exception e) {
                 log.error(i18n.getString("command.run.cargo.failed_to_start"));
-                throw new RuntimeException(e);
+                throw new CommandLine.PicocliException(e.getLocalizedMessage(), e);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new CommandLine.PicocliException(e.getLocalizedMessage(), e);
         }
     }
 }

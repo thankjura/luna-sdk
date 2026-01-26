@@ -14,14 +14,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>ru.slie.luna</groupId>
-            <artifactId>luna-web</artifactId>
-            <version>1.0.0</version>
-            <type>war</type>
-            <scope>system</scope>
-            <systemPath>${user.home}/.m2/repository/ru/slie/luna/luna-web/1.0.0/luna-web-1.0.0.war</systemPath>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sdk-cli</artifactId>
             <version>${project.version}</version>
@@ -104,7 +96,6 @@
     </build>
 
     <properties>
-        <dist.repo.target>${project.build.directory}/repository</dist.repo.target>
         <apache.maven.dependency.plugin.vaersion>3.9.0</apache.maven.dependency.plugin.vaersion>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>

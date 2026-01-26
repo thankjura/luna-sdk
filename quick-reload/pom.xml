@@ -3,13 +3,15 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
+<!--    <parent>-->
         <groupId>ru.slie.luna</groupId>
-        <artifactId>luna-sdk</artifactId>
+<!--        <artifactId>luna-sdk</artifactId>-->
         <version>1.0.0</version>
-    </parent>
-
+<!--    </parent>-->
     <artifactId>quick-reload</artifactId>
+    <packaging>luna-plugin</packaging>
+
+
     <name>Quick reload plugin</name>
     <description>Watch directory and reload plugin after update</description>
 
@@ -63,30 +65,12 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.8.0</version>
-                <executions>
-                    <execution>
-                        <id>jar-with-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>ru.slie.luna.maven</groupId>
+                <artifactId>luna-maven-plugin</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
@@ -97,6 +81,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.plugin.updates.check>false</maven.plugin.updates.check>
     </properties>
 
 </project>

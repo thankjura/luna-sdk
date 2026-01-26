@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v6
+
+key: ${project.groupId}.${project.artifactId}
+name: ${project.name}
+version: ${project.version}
+description: "${project.description}"
+vendor:
+  name: ${project.organization.name}
+  url: ${project.organization.url}
+resources:
+  - key: messages
+    type: i18n
+    path: messages
+  - key: DemoComponent
+    type: comp
+    path: frontend/DemoComponent.js
+routes:
+  - routeName: myDemoPage
+    routePath: my-demo-page
+    component: frontend/DemoView.js
+    parent: admin
+components:
+  - key: DemoAdminSideBarSection
+    name: Demo admin side bar section
+    className: ru.slie.luna.template.web.DemoAdminSideBarSection
+
+  - key: DemoAdminWebItem
+    name: Demo console web item
+    className: ru.slie.luna.template.web.DemoAdminWebItem

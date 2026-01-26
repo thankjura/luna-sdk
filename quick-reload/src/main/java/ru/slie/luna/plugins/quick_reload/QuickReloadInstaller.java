@@ -1,5 +1,6 @@
 package ru.slie.luna.plugins.quick_reload;
 
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ import java.util.regex.Pattern;
 @Component
 public class QuickReloadInstaller {
     private static final Logger log = LoggerFactory.getLogger(QuickReloadInstaller.class);
-    private static final Pattern JAR_PATTERN = Pattern.compile("^(.*?)-(\\d+(?:\\.\\d+)*)(?:-jar-with-dependencies)?\\.jar$");
+    private static final Pattern JAR_PATTERN = Pattern.compile("^(?<name>.*?)-(?<version>\\d+(?:\\.\\d+.*?)*)(?<deps>-jar-with-dependencies)?\\.jar$");
 
     private final I18nResolver i18n;
     private final PluginManager pluginManager;
@@ -77,10 +78,10 @@ public class QuickReloadInstaller {
                 String fileName = path.getFileName().toString();
                 Matcher matcher = JAR_PATTERN.matcher(fileName);
                 if (matcher.matches()) {
-                    String pluginName = matcher.group(1);
-                    String version = matcher.group(2);
-                    boolean withDeps = fileName.contains("-jar-with-dependencies");
-                    plugins.add(new PluginFile(pluginName, version, withDeps, path));
+                    String pluginName = matcher.group("name");
+                    String version = matcher.group("version");
+                    String deps = matcher.group("deps");
+                    plugins.add(new PluginFile(pluginName, new ComparableVersion(version), deps != null, path));
                 }
             }
         } catch (IOException e) {

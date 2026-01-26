@@ -17,16 +17,10 @@
             <fileMode>0755</fileMode>
             <filtered>true</filtered>
         </fileSet>
-        <fileSet>
-            <directory>${project.build.directory}/repository</directory>
-            <outputDirectory>repository</outputDirectory>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
     </fileSets>
     <files>
         <file>
-            <source>../quick-reload/target/quick-reload-${project.version}-jar-with-dependencies.jar</source>
+            <source>../quick-reload/target/quick-reload-${project.version}.jar</source>
             <outputDirectory>plugins</outputDirectory>
             <destName>quick-reload-${project.version}.jar</destName>
             <fileMode>0644</fileMode>
