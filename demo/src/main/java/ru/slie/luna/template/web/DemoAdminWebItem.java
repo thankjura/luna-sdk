@@ -16,7 +16,7 @@ public class DemoAdminWebItem implements WebItem {
 
     @Override
     public String getId() {
-        return "console";
+        return "demoItem";
     }
 
     @Override
@@ -36,6 +36,7 @@ public class DemoAdminWebItem implements WebItem {
 
     @Override
     public String getRouteName() {
+        // routeName from luna-plugin.yaml
         return "myDemoPage";
     }
 

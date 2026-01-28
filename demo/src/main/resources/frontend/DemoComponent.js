@@ -1,11 +1,5 @@
 import { openBlock, createElementBlock } from "vue";
-const _export_sfc = (sfc, props) => {
-  const target = sfc.__vccOpts || sfc;
-  for (const [key, val] of props) {
-    target[key] = val;
-  }
-  return target;
-};
+import { _ as _export_sfc } from "./_plugin-vue_export-helper-1tPrXgE0.js";
 const _sfc_main = {};
 const _hoisted_1 = { class: "" };
 function _sfc_render(_ctx, _cache) {

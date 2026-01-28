@@ -1,6 +1,6 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v6
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v12
 
-key: ${project.groupId}.${project.artifactId}
+key: ${project.groupId}.${project.artifactId} # Resolved from pom.xml
 name: ${project.name}
 version: ${project.version}
 description: "${project.description}"
@@ -11,19 +11,27 @@ resources:
   - key: messages
     type: i18n
     path: messages
-  - key: DemoComponent
+  - key: DemoComponent # Use unique names for components
     type: comp
-    path: frontend/DemoComponent.js
+    path: frontend/DemoComponent.js # Path to compiled component
+  - key: styles
+    type: css
+    path: frontend/frontend.css
 routes:
-  - routeName: myDemoPage
+  - routeName: myDemoPage # Unique route name, use it in WebItem
     routePath: my-demo-page
-    component: frontend/DemoView.js
+    component: frontend/DemoView.js # Path to compiled component
     parent: admin
+scanPackages:
+  - ru.slie.luna.template # Scan packages for auto-inject components
+restPackages:
+  - name: Rest pack
+    packages:
+      - ru.slie.luna.template.rest
 components:
   - key: DemoAdminSideBarSection
     name: Demo admin side bar section
     className: ru.slie.luna.template.web.DemoAdminSideBarSection
-
   - key: DemoAdminWebItem
     name: Demo console web item
     className: ru.slie.luna.template.web.DemoAdminWebItem

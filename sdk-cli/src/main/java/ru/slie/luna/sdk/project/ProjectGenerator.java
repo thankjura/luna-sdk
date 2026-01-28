@@ -38,6 +38,8 @@ public class ProjectGenerator {
             content = content.replaceAll("<version>1.0.0-SNAPSHOT</version>", "<version>" + targetVersion + "</version>");
         } else if (source.toString().endsWith(".yaml") || source.toString().endsWith(".yml")) {
             content = content.replaceAll(DEMO_GROUP_ID, targetGroupId);
+        } else if (source.toString().endsWith("client.ts")) {
+            content = content.replaceAll(DEMO_GROUP_ID + "." + DEMO_ARTIFACT_ID, targetGroupId + "." + targetArtifactId);
         }
 
         return content;

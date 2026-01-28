@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v3
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v11
 
 key: ${project.groupId}.${project.artifactId}
 name: ${project.name}
@@ -11,7 +11,19 @@ resources:
   - key: messages
     path: messages
     type: i18n
+routes:
+  - routeName: demoRoute
+    routePath: demo-route
+    component: frontend/DemoView.js
+restPackages:
+  - name: Rest pack
+    packages:
+      - ru.slie.luna.templates.rest
+
 components:
-  - key: HelloWorldRest
-    name: Test rest controller
-    className: ru.slie.luna.demo.HelloWorldRest
+  - key: DemoAdminSection
+    name: Admin demo section
+    className: ru.slie.luna.web.DemoAdminSideBarSection
+  - key: DemoWebItem
+    name: Admin demo web item
+    className: ru.slie.luna.web.DemoAdminWebItem

@@ -6,10 +6,13 @@ import { viteExternalsPlugin } from "vite-plugin-externals";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-      viteExternalsPlugin({
-        'luna': '__LUNA_COMPONENTS__',
-      }),
-      vue()
+    viteExternalsPlugin({
+      'luna': '__LUNA_COMPONENTS__',
+      'vue': 'Vue',
+      'axios': 'axios',
+      'I18N': 'I18N'
+    }),
+    vue()
   ],
   resolve: {
     alias: {
@@ -34,6 +37,7 @@ export default defineConfig({
         exports: 'named',
         globals: {
           vue: 'Vue',
+          axios: 'axios'
         },
 
       },
