@@ -30,16 +30,15 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue'],
+      external: ['vue', 'axios', 'I18N'],
       output: {
         entryFileNames: '[name].js',
-        //chunkFileNames: '[name].js',
         exports: 'named',
         globals: {
           vue: 'Vue',
-          axios: 'axios'
+          axios: 'axios',
+          I18N: 'I18N',
         },
-
       },
     },
     outDir: resolve(__dirname, '../src/main/resources/frontend'),

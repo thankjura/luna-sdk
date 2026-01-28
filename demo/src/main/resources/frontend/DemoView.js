@@ -9,7 +9,7 @@ const __variableDynamicImportRuntimeHelper = (glob$1, path$13, segs) => {
 const I18N = window["__LUNA_COMPONENTS__"].I18N;
 const loadI18N = async (locale) => {
   try {
-    const { messages } = await __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({}), `./locales/messages_${locale}.ts`, 3);
+    const { messages } = await __variableDynamicImportRuntimeHelper(/* @__PURE__ */ Object.assign({ "../locales/messages_ru.ts": () => import("./messages_ru-D4TAdnEq.js") }), `../locales/messages_${locale}.ts`, 3);
     return messages;
   } catch (e) {
     return {};
@@ -17,7 +17,7 @@ const loadI18N = async (locale) => {
 };
 const $i18n = new I18N(["ru"], loadI18N);
 const axios = window["axios"];
-const baseURL = "/rest/plugin/ru.slie.luna.templates.demo-addon";
+const baseURL = "/rest/plugin/ru.slie.luna.template.demo-addon";
 const client = axios.create({ baseURL });
 class DemoService {
   async getHello() {
@@ -50,6 +50,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
       }).finally(() => {
         busy.value = false;
       });
+      console.log($i18n);
     };
     return (_ctx, _cache) => {
       return _openBlock(), _createElementBlock("div", _hoisted_1, [
@@ -78,7 +79,7 @@ const _sfc_main = /* @__PURE__ */ _defineComponent({
     };
   }
 });
-const DemoView = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-b908a0eb"]]);
+const DemoView = /* @__PURE__ */ _export_sfc(_sfc_main, [["__scopeId", "data-v-d4fbd23d"]]);
 export {
   DemoView as default
 };

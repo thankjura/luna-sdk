@@ -14,6 +14,8 @@ const showMessage = () => {
   }).finally(() => {
     busy.value = false;
   })
+
+  console.log($i18n);
 }
 
 </script>
