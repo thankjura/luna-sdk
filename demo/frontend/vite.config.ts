@@ -5,6 +5,7 @@ import { viteExternalsPlugin } from "vite-plugin-externals";
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: './',
   plugins: [
     viteExternalsPlugin({
       'luna': '__LUNA_COMPONENTS__',

@@ -19,7 +19,7 @@ import ru.slie.luna.sdk.command.RunCommand;
         resourceBundle = "messages")
 public class LunaCliMain implements Runnable {
     public static void main(String[] args) {
-        CommandLine cmd = new CommandLine(new LunaCliMain());
+        CommandLine cmd = new CommandLine(new LunaCliMain()).setStopAtPositional(false).setAllowOptionsAsOptionParameters(true);
         int exitCode = cmd.execute(args);
         System.exit(exitCode);
     }

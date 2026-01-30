@@ -28,7 +28,7 @@ public class RunCommand implements Runnable {
     private final I18nResolver i18n = new I18nResolver();
     private final Logger log = LoggerFactory.getLogger("luna-sdk");
 
-    @CommandLine.Option(names = {"-j", "--jvmargs"}, descriptionKey = "command.run.option.jvmargs")
+    @CommandLine.Option(names = {"-j", "--jvmargs"}, descriptionKey = "command.run.option.jvmargs", arity = "1")
     private String jvmArgs;
 
     @CommandLine.Option(names = {"-p", "--port"}, descriptionKey = "command.run.option.listen_port")
@@ -40,7 +40,7 @@ public class RunCommand implements Runnable {
     @CommandLine.Option(names = {"-d", "--db-uri"}, descriptionKey = "command.run.option.db_uri")
     private String dbUri;
 
-    @CommandLine.Option(names = {"-a", "--attach"}, descriptionKey = "command.run.option.attach_logs")
+    @CommandLine.Option(names = {"-a", "--attach"}, descriptionKey = "command.run.option.attach_logs", arity = "0")
     private Boolean attach = false;
 
     @Override
