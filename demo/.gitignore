@@ -10,6 +10,8 @@ frontend/dist/
 frontend/vite.config.d.ts
 frontend/vite.config.js
 
+src/main/resources/frontend
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

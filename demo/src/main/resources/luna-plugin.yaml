@@ -11,16 +11,17 @@ resources:
   - key: messages
     type: i18n
     path: messages
-  - key: DemoComponent # Use unique names for components
-    type: comp
-    path: frontend/DemoComponent.js # Path to compiled component
   - key: styles
     type: css
     path: frontend/frontend.css
 routes:
   - routeName: myDemoPage # Unique route name, use it in WebItem
-    routePath: my-demo-page
+    routePath: demo-page
     component: frontend/DemoView.js # Path to compiled component
+    parent: admin
+  - routeName: myTodoPage
+    routePath: todo-page
+    component: frontend/TodoView.js
     parent: admin
 scanPackages:
   - ru.slie.luna.template # Scan packages for auto-inject components
@@ -28,10 +29,15 @@ restPackages:
   - name: Rest pack
     packages:
       - ru.slie.luna.template.rest
+activeDocs:
+  - ru.slie.luna.template.db.CardEntity
 components:
-  - key: DemoAdminSideBarSection
+  - key: TodoAdminSideBarSection
     name: Demo admin side bar section
     className: ru.slie.luna.template.web.DemoAdminSideBarSection
   - key: DemoAdminWebItem
-    name: Demo console web item
+    name: Demo web item
     className: ru.slie.luna.template.web.DemoAdminWebItem
+  - key: TodoAdminWebItem
+    name: Todo web item
+    className: ru.slie.luna.template.web.TodoAdminWebItem

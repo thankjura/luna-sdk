@@ -1,1 +1,0 @@
-{"version":3,"file":"DemoComponent.js","sources":["../../../../frontend/src/components/DemoComponent.vue"],"sourcesContent":["<script setup lang=\"ts\">\n\n</script>\n\n<template>\n  <div class=\"\">Hello world</div>\n</template>\n\n<style>\n\n</style>"],"names":["_createElementBlock"],"mappings":";;;AAKO,MAAA,aAAA,EAAA,OAAM,GAAE;;sBAAbA,mBAA+B,OAA/B,YAAc,aAAW;;;"}

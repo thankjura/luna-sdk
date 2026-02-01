@@ -13,9 +13,7 @@ const showMessage = () => {
     $notify.ok(data.data.message);
   }).finally(() => {
     busy.value = false;
-  })
-
-  console.log($i18n);
+  });
 }
 
 </script>

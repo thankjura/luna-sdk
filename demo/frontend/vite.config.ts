@@ -1,17 +1,20 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
-import { viteExternalsPlugin } from "vite-plugin-externals";
+import pluginExternal from "vite-plugin-external";
 
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
   plugins: [
-    viteExternalsPlugin({
-      'luna': '__LUNA_COMPONENTS__',
-      'vue': 'Vue',
-      'axios': 'axios',
-      'I18N': 'I18N'
+    pluginExternal({
+      externals: {
+        'luna': '__LUNA_COMPONENTS__',
+        'vue': 'Vue',
+        'axios': 'axios',
+        'I18N': 'I18N',
+        'sortablejs': 'Sortable',
+      }
     }),
     vue()
   ],
@@ -26,20 +29,14 @@ export default defineConfig({
     lib: {
       entry: [
       	resolve(__dirname, 'src/views/DemoView.vue'),
-      	resolve(__dirname, 'src/components/DemoComponent.vue')
+        resolve(__dirname, 'src/views/TodoView.vue'),
       ],
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', 'axios', 'I18N'],
       output: {
         entryFileNames: '[name].js',
         exports: 'named',
-        globals: {
-          vue: 'Vue',
-          axios: 'axios',
-          I18N: 'I18N',
-        },
       },
     },
     outDir: resolve(__dirname, '../src/main/resources/frontend'),

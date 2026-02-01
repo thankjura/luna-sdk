@@ -7,16 +7,16 @@ import ru.slie.luna.web.WebItem;
 import java.util.Map;
 
 @Component
-public class DemoAdminWebItem implements WebItem {
+public class TodoAdminWebItem implements WebItem {
     private final I18nResolver i18n;
 
-    public DemoAdminWebItem(I18nResolver i18n) {
+    public TodoAdminWebItem(I18nResolver i18n) {
         this.i18n = i18n;
     }
 
     @Override
     public String getId() {
-        return "demoItem";
+        return "todoItem";
     }
 
     @Override
@@ -31,13 +31,13 @@ public class DemoAdminWebItem implements WebItem {
 
     @Override
     public String getName() {
-        return i18n.getText("demo.web.item.demo.label");
+        return i18n.getText("demo.web.item.label");
     }
 
     @Override
     public String getRouteName() {
         // routeName from luna-plugin.yaml
-        return "myDemoPage";
+        return "myTodoPage";
     }
 
     @Override
