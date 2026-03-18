@@ -9,7 +9,7 @@
     "i18n": "node --no-warnings=ExperimentalWarning --loader ts-node/esm generateI18nStrings.ts"
   },
   "dependencies": {
-    "axios": "^1.13.4",
+    "axios": "^1.13.6",
     "sortablejs": "^1.15.6",
     "vue": "^3.5.24"
   },
@@ -20,8 +20,7 @@
     "sass": "^1.85.0",
     "ts-node": "^10.9.2",
     "typescript": "~5.9.2",
-    "vite": "7.1.11",
-    "vite-plugin-externals": "^0.6.2",
+    "vite": "8.0.0",
     "vue-component-type-helpers": "^3.1.0",
     "vue-tsc": "^3.1.0"
   }

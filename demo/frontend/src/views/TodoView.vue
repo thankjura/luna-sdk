@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
   <div class="todo-page pad">
     <TodoColumnComponent :cards="cardsMap['open']" state="open" @move="moveCard"></TodoColumnComponent>
     <TodoColumnComponent :cards="cardsMap['done']" state="done" @move="moveCard"></TodoColumnComponent>
-    <div class="form">
+    <div>
       <h3>{{ $i18n.t("New Card") }}</h3>
       <form class="form panel pad" @submit.prevent="createCard">
           <textarea v-model="cardValue" :placeholder="$i18n.t('Todo')"></textarea>
@@ -128,7 +128,7 @@ onBeforeUnmount(() => {
       margin-top: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 20px;
     }
 
     .trash {
@@ -139,6 +139,7 @@ onBeforeUnmount(() => {
       align-items: center;
       justify-content: center;
       position: relative;
+      margin-top: 20px;
 
       .trash-container {
         position: absolute;

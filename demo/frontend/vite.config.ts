@@ -33,7 +33,7 @@ export default defineConfig({
       ],
       formats: ['es'],
     },
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         entryFileNames: '[name].js',
         exports: 'named',
