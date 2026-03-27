@@ -31,10 +31,11 @@ restPackages:
       - ru.slie.luna.template.rest
 activeDocs:
   - ru.slie.luna.template.db.CardEntity
-components:
+webSections:
   - key: TodoAdminSideBarSection
     name: Demo admin side bar section
     className: ru.slie.luna.template.web.DemoAdminSideBarSection
+webItems:
   - key: DemoAdminWebItem
     name: Demo web item
     className: ru.slie.luna.template.web.DemoAdminWebItem
