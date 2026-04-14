@@ -57,7 +57,7 @@ const loadCards = () => {
   })
 }
 
-const moveCard = (cardId: string, state: CardState) => {
+const moveCard = (cardId: number, state: CardState) => {
   busy.value = true;
   todoService.patchCard(cardId, {state}).then((data) => {
     const idx = cards.value.findIndex(c => c.id == data.data.id);
@@ -73,7 +73,7 @@ const moveCard = (cardId: string, state: CardState) => {
 
 const onTrash = (event: SortableEvent) => {
   busy.value = true;
-  todoService.deleteCard(event.item.dataset.id).then(() => {
+  todoService.deleteCard(Number(event.item.dataset.id)).then(() => {
     $notify.info($i18n.t("Card removed"));
   }).finally(() => {
     busy.value = false;

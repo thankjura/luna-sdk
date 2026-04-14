@@ -10,15 +10,15 @@ class TodoService {
     return client.post<Card>('/todo', {value});
   }
 
-  async updateCard(cardId: string, card: Partial<Card>) {
+  async updateCard(cardId: number, card: Partial<Card>) {
     return client.put<Card>(`/todo/${cardId}`, card);
   }
 
-  async patchCard(cardId: string, card: Partial<Card>) {
+  async patchCard(cardId: number, card: Partial<Card>) {
     return client.patch<Card>(`/todo/${cardId}`, card);
   }
 
-  async deleteCard(cardId: string) {
+  async deleteCard(cardId: number) {
     return client.delete(`/todo/${cardId}`);
   }
 }

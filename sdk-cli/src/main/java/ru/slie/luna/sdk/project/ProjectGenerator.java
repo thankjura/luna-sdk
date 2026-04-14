@@ -1,7 +1,7 @@
 package ru.slie.luna.sdk.project;
 
 import org.eclipse.aether.artifact.Artifact;
-import org.springframework.lang.NonNull;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.net.URI;

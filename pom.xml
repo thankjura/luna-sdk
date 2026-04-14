@@ -14,7 +14,7 @@
   </modules>
 
   <properties>
-    <luna.version>2.0.0-SNAPSHOT</luna.version>
+    <luna.version>3.0.0-SNAPSHOT</luna.version>
     <apache.maven.version>3.9.12</apache.maven.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>

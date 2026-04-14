@@ -10,10 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import picocli.CommandLine;
-import ru.slie.luna.sdk.utils.CargoUtils;
-import ru.slie.luna.sdk.utils.DataBaseProvider;
-import ru.slie.luna.sdk.utils.I18nResolver;
-import ru.slie.luna.sdk.utils.ProjectUtils;
+import ru.slie.luna.sdk.utils.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -81,14 +78,19 @@ public class RunCommand implements Runnable {
         }
         Path warPath = result.getArtifact().getFile().toPath();
 
-        try (DataBaseProvider dataBaseProvider = new DataBaseProvider(targetDir, dbUri)) {
-            String uri = dataBaseProvider.getConnectionString();
-            String database = dataBaseProvider.getDataBaseName();
+        DataBaseConfig config = null;
 
-            log.info(i18n.getString("command.run.mongo.run", uri));
+        if (dbUri != null) {
+            config = new DataBaseConfig(dbUri);
+        }
+
+        try (DataBaseProvider dataBaseProvider = new DataBaseProvider(targetDir, config)) {
+            config = dataBaseProvider.getConfig();
+
+            log.info(i18n.getString("command.run.database.run", config.getDbUri()));
 
             try {
-                Files.writeString(lunaHome.resolve("database.yml"), String.format("uri: %s\ndatabase: %s", uri, database));
+                Files.writeString(lunaHome.resolve("database.yml"), config.toYamlConfig());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

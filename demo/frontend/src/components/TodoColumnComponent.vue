@@ -11,14 +11,14 @@ const props = defineProps({
 })
 
 const emits = defineEmits({
-  move: (cardId: string, state: string) => true
+  move: (_cardId: number, _state: string) => true
 })
 
 const container = useTemplateRef<HTMLDivElement>('container');
 let sortable: Sortable = null;
 
 const onAdd = (event: SortableEvent) => {
-  emits('move', event.item.dataset.id, props.state);
+  emits('move', Number(event.item.dataset.id), props.state);
 }
 
 onMounted(() => {

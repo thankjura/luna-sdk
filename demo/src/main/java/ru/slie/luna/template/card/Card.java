@@ -17,9 +17,9 @@ public class Card {
         return entity;
     }
 
-    public String getId() {
+    public Long getId() {
         if (entity.getId() != null) {
-            return entity.getId().toString();
+            return entity.getId();
         }
 
         return null;

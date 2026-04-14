@@ -1,13 +1,12 @@
 package ru.slie.luna.template.db;
 
-import dev.morphia.annotations.Entity;
-import ru.slie.luna.regolith.AbstractActiveDocEntity;
+import ru.slie.luna.regolith.ActiveDocEntity;
 import ru.slie.luna.template.card.CardState;
 
 import java.time.LocalDateTime;
 
-@Entity(value = "cards", useDiscriminator = false)
-public class CardEntity extends AbstractActiveDocEntity {
+//@Entity(value = "cards", useDiscriminator = false)
+public class CardEntity extends ActiveDocEntity {
     private String value;
     private String state;
     private LocalDateTime created;

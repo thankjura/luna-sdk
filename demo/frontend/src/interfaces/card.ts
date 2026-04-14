@@ -4,7 +4,7 @@ export enum CardState {
 }
 
 export interface Card {
-  id: string,
+  id: number,
   value: string,
   state: CardState,
   created: string,

@@ -1,18 +1,12 @@
 package ru.slie.luna.template.card;
 
-import dev.morphia.query.FindOptions;
-import dev.morphia.query.MorphiaCursor;
-import dev.morphia.query.Query;
-import dev.morphia.query.Sort;
 import org.springframework.stereotype.Component;
+import ru.slie.luna.db.query.DeleteResult;
 import ru.slie.luna.exception.ValidateException;
 import ru.slie.luna.locale.I18nResolver;
 import ru.slie.luna.regolith.ActiveDocManager;
-import ru.slie.luna.search.DeleteInfo;
-import ru.slie.luna.search.DeleteInfoImpl;
 import ru.slie.luna.template.db.CardEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,23 +35,16 @@ public class CardManager {
         validateException.raise();
     }
 
-    public Optional<Card> getCardById(String cardId) {
+    public Optional<Card> getCardById(Long cardId) {
         Optional<CardEntity> entity = activeDocManager.getById(CardEntity.class, cardId);
         return entity.map(Card::new);
 
     }
 
     public List<Card> getCards() {
-        Query<CardEntity> query = activeDocManager.query(CardEntity.class);
-        List<Card> out = new ArrayList<>();
+        List<CardEntity> cards = activeDocManager.query(CardEntity.class).list();
 
-        try (MorphiaCursor<CardEntity> cursor =  query.iterator(new FindOptions().sort(Sort.ascending("created")))) {
-            while (cursor.hasNext()) {
-                out.add(new Card(cursor.next()));
-            }
-        }
-
-        return out;
+        return cards.stream().map(Card::new).toList();
     }
 
     public Card createCard(String value) {
@@ -73,12 +60,12 @@ public class CardManager {
         activeDocManager.save(entity);
     }
 
-    public DeleteInfo delete(String cardId) {
+    public DeleteResult delete(Long cardId) {
         Optional<CardEntity> entity = activeDocManager.getById(CardEntity.class, cardId);
         if (entity.isPresent()) {
             return activeDocManager.delete(entity.get());
         }
 
-        return new DeleteInfoImpl();
+        return new DeleteResult(0);
     }
 }
