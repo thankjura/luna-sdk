@@ -29,6 +29,7 @@ public class DataBaseProvider implements AutoCloseable {
             dataBaseConfig.setPort(postgreSQLContainer.getMappedPort(5432));
             dataBaseConfig.setUsername(postgreSQLContainer.getUsername());
             dataBaseConfig.setPassword(postgreSQLContainer.getPassword());
+            dataBaseConfig.setDatabase(postgreSQLContainer.getDatabaseName());
         }
     }
 
