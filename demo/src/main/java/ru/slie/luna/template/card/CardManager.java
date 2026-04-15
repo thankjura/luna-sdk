@@ -1,5 +1,6 @@
 package ru.slie.luna.template.card;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 import ru.slie.luna.db.query.DeleteResult;
 import ru.slie.luna.exception.ValidateException;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@Transactional
 public class CardManager {
     private final ActiveDocManager activeDocManager;
     private final I18nResolver i18n;
@@ -63,7 +65,8 @@ public class CardManager {
     public DeleteResult delete(Long cardId) {
         Optional<CardEntity> entity = activeDocManager.getById(CardEntity.class, cardId);
         if (entity.isPresent()) {
-            return activeDocManager.delete(entity.get());
+            activeDocManager.delete(entity.get());
+            return new DeleteResult(1);
         }
 
         return new DeleteResult(0);

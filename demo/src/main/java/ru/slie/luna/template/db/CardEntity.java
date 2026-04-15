@@ -1,11 +1,14 @@
 package ru.slie.luna.template.db;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import ru.slie.luna.regolith.ActiveDocEntity;
 import ru.slie.luna.template.card.CardState;
 
 import java.time.LocalDateTime;
 
-//@Entity(value = "cards", useDiscriminator = false)
+@Entity
+@Table(name = "cards")
 public class CardEntity extends ActiveDocEntity {
     private String value;
     private String state;
