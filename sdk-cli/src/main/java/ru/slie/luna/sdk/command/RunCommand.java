@@ -13,9 +13,8 @@ import picocli.CommandLine;
 import ru.slie.luna.sdk.utils.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.file.*;
 
 import static ru.slie.luna.sdk.utils.MavenRepositoryHelper.getArtifact;
 import static ru.slie.luna.sdk.utils.ProjectUtils.getModel;
@@ -93,6 +92,16 @@ public class RunCommand implements Runnable {
                 Files.writeString(lunaHome.resolve("database.yml"), config.toYamlConfig());
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            }
+
+            if (!Files.exists(lunaHome.resolve("luna.license"))) {
+                try (InputStream is = getClass().getResourceAsStream("luna.license")) {
+                    if (is != null) {
+                        Files.copy(is, lunaHome.resolve("luna.license"));
+                    }
+                } catch (IOException e) {
+                    log.error(i18n.getString("command.run.failed_copy_license"), e);
+                }
             }
 
             log.info(i18n.getString("command.run.cargo.run"));
