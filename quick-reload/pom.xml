@@ -19,26 +19,11 @@
 
     <dependencyManagement>
         <dependencies>
-<!--            <dependency>-->
-<!--                <groupId>javax.xml.bind</groupId>-->
-<!--                <artifactId>jaxb-api</artifactId>-->
-<!--                <version>2.3.1</version>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
                 <version>4.0.7</version>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.sun.istack</groupId>-->
-<!--                <artifactId>istack-commons-runtime</artifactId>-->
-<!--                <version>4.1.2</version>-->
-<!--            </dependency>-->
-<!--            <dependency>-->
-<!--                <groupId>com.sun.xml.fastinfoset</groupId>-->
-<!--                <artifactId>FastInfoset</artifactId>-->
-<!--                <version>2.1.1</version>-->
-<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
