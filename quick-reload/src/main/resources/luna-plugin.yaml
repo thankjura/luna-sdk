@@ -1,9 +1,10 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/thankjura/luna-schemas/refs/heads/master/luna-plugin.schema.json?v=1
 
 key: ${project.groupId}.${project.artifactId}
 name: ${project.name}
 version: ${project.version}
 description: ${project.description}
+
 scanPackages:
   - ru.slie.luna.plugins.quick_reload
 
@@ -16,15 +17,17 @@ resources:
     path: quickreload
     type: i18n
 
-components:
+restPackages:
+  - name: Rest module
+    packages:
+      - ru.slie.luna.plugins.quick_reload.rest
+
+filters:
   - key: PluginResourceFilter
     name: Override resources rest endpoints
     className: ru.slie.luna.plugins.quick_reload.rest.PluginResourceFilter
 
+components:
   - key: PluginReloadService
     name: Quick reload plugin service
     className: ru.slie.luna.plugins.quick_reload.QuickReloadService
-
-  - key: MonitorRest
-    name: Quick reload rest
-    className: ru.slie.luna.plugins.quick_reload.rest.MonitorRest

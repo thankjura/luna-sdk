@@ -66,7 +66,7 @@ public class RunCommand implements Runnable {
             throw new CommandLine.PicocliException(i18n.getString("command.run.please_define_luna_version"));
         }
 
-
+        // TODO: download from size
         Artifact artifact = new DefaultArtifact("ru.slie.luna", "luna-web", "war", model.getProperties().getProperty("luna.version"));
         ArtifactResult result;
 

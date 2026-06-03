@@ -17,6 +17,31 @@
         <url>mailto:me@slie.ru</url>
     </organization>
 
+    <dependencyManagement>
+        <dependencies>
+<!--            <dependency>-->
+<!--                <groupId>javax.xml.bind</groupId>-->
+<!--                <artifactId>jaxb-api</artifactId>-->
+<!--                <version>2.3.1</version>-->
+<!--            </dependency>-->
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>4.0.7</version>
+            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.sun.istack</groupId>-->
+<!--                <artifactId>istack-commons-runtime</artifactId>-->
+<!--                <version>4.1.2</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>com.sun.xml.fastinfoset</groupId>-->
+<!--                <artifactId>FastInfoset</artifactId>-->
+<!--                <version>2.1.1</version>-->
+<!--            </dependency>-->
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>ru.slie.luna</groupId>
@@ -33,7 +58,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>3.9.12</version>
+            <version>3.9.14</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -50,7 +75,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>7.0.2</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -66,14 +91,14 @@
             <plugin>
                 <groupId>ru.slie.luna.maven</groupId>
                 <artifactId>luna-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.0</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>
     </build>
 
     <properties>
-        <luna.version>2.0.0-SNAPSHOT</luna.version>
+        <luna.version>3.0.0</luna.version>
         <spring.version>7.0.2</spring.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
