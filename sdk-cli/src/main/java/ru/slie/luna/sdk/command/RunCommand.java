@@ -94,8 +94,10 @@ public class RunCommand implements Runnable {
                 throw new RuntimeException(e);
             }
 
+            log.info(i18n.getString("command.run.check_license"));
             if (!Files.exists(lunaHome.resolve("luna.license"))) {
-                try (InputStream is = getClass().getResourceAsStream("luna.license")) {
+                log.info(i18n.getString("command.run.copy_license"));
+                try (InputStream is = getClass().getClassLoader().getResourceAsStream("luna.license")) {
                     if (is != null) {
                         Files.copy(is, lunaHome.resolve("luna.license"));
                     }

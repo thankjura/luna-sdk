@@ -10,6 +10,7 @@ public class DataBaseConfig {
     private String username;
     private String password;
     private String database;
+    private static final I18nResolver i18n = new I18nResolver();
 
     public DataBaseConfig() {
         this.host = "localhost";
@@ -23,7 +24,7 @@ public class DataBaseConfig {
         this();
         Properties props = Driver.parseURL(dbUri, null);
         if (props == null) {
-            throw new IllegalArgumentException("Failed parse db uri");
+            throw new IllegalArgumentException(i18n.getString("database.provider.parse_uri_error"));
         }
         this.host = props.getProperty("host");
         this.port = Integer.parseInt(props.getProperty("port"));

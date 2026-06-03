@@ -7,7 +7,7 @@ import Sortable, { SortableEvent } from "sortablejs";
 
 const props = defineProps({
   cards: Array as PropType<Array<Card>>,
-  state: String
+  state: String,
 })
 
 const emits = defineEmits({

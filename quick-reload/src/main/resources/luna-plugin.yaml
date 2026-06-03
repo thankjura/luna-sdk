@@ -28,6 +28,6 @@ filters:
     className: ru.slie.luna.plugins.quick_reload.rest.PluginResourceFilter
 
 components:
-  - key: PluginReloadService
+  - key: QuickReloadService
     name: Quick reload plugin service
     className: ru.slie.luna.plugins.quick_reload.QuickReloadService

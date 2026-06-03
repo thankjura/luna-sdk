@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
 import ru.slie.luna.system.plugin.PluginDescriptor;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+@Component
 public class QuickReloadService implements InitializingBean, DisposableBean {
     private final Logger log = LoggerFactory.getLogger(QuickReloadService.class);
     private volatile QuickReloadWatcher watcher;

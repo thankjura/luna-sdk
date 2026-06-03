@@ -212,7 +212,7 @@ public class CustomZipURLInstaller extends ZipURLInstaller {
             }
 
             if (!this.getFileHandler().exists(targetFile)) {
-                log.debug(i18n.getString("cargo.installer.container_is_not_yet_downloaded", this.getSourceFileName()));
+                log.info(i18n.getString("cargo.installer.container_is_not_yet_downloaded", this.getSourceFileName()));
                 this.download();
             }
 

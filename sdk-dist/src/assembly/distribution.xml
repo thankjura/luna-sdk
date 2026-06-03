@@ -20,9 +20,9 @@
     </fileSets>
     <files>
         <file>
-            <source>../quick-reload/target/quick-reload-${project.version}.jar</source>
+            <source>../quick-reload/target/quick-reload-1.0.2.jar</source>
             <outputDirectory>plugins</outputDirectory>
-            <destName>quick-reload-${project.version}.jar</destName>
+            <destName>quick-reload-1.0.2.jar</destName>
             <fileMode>0644</fileMode>
         </file>
     </files>
