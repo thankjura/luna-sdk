@@ -6,7 +6,8 @@
     <parent>
         <groupId>ru.slie.luna</groupId>
         <artifactId>luna-sdk</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>sdk-cli</artifactId>
 
