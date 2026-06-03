@@ -1,6 +1,7 @@
 package ru.slie.luna.sdk.utils;
 
 import org.postgresql.Driver;
+import org.postgresql.PGProperty;
 
 import java.util.Properties;
 
@@ -26,11 +27,15 @@ public class DataBaseConfig {
         if (props == null) {
             throw new IllegalArgumentException(i18n.getString("database.provider.parse_uri_error"));
         }
-        this.host = props.getProperty("host");
-        this.port = Integer.parseInt(props.getProperty("port"));
-        this.username = props.getProperty("username");
-        this.password = props.getProperty("password");
-        this.database = props.getProperty("database");
+        try {
+            this.host = PGProperty.PG_HOST.getOrDefault(props);
+            this.port = PGProperty.PG_PORT.getInt(props);
+            this.username = PGProperty.USER.getOrDefault(props);
+            this.password = PGProperty.PASSWORD.getOrNull(props);
+            this.database = PGProperty.PG_DBNAME.getOrDefault(props);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(i18n.getString("database.provider.parse_uri_error"));
+        }
     }
 
     public String getDbUri() {
