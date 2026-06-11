@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { TogglePanel, ButtonBusy, NotifyComponentInterface } from 'luna';
+import { TogglePanel, ButtonBusy, Injections } from 'luna';
 import { $i18n } from "@/utils/i18n.ts";
 import { inject, ref } from "vue";
 import { demoService } from "@/service/demoService.ts";
 
 const busy = ref(false);
-const $notify = inject<NotifyComponentInterface>('$notify');
+const $notify = inject(Injections.$notify);
 
 const showMessage = () => {
   busy.value = true;

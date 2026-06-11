@@ -28,7 +28,6 @@ onMounted(() => {
     onAdd: onAdd,
     ghostClass: 'ghost-card',
     forceFallback: true,
-
   })
 })
 
