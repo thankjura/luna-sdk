@@ -356,6 +356,17 @@ declare module 'luna' {
       id?: string
       modelValue?: boolean
     }, {}, {}, SlotsType<{}>>;
+  export const SortableTable: DefineComponent<
+    {},{}, {}, {}, {}, {}, {}, {
+      'updated': [_event: SortableEvent]
+      'changed': [_event: SortableEvent]
+    }, {}, {
+      group?: string
+    }, {}, {}, SlotsType<{
+      header: any,
+      default: any,
+      footer: any,
+    }>>;
   export const I18N: I18N & {new(supportedLocales: Array<string>, loader: (locale: string) => Promise<Record<string, string>>): I18N}
   export const RouteNames: {
         home: "home",
@@ -562,7 +573,7 @@ declare module 'luna' {
   export interface IssueType {
       id: number,
       name: string,
-      subTask?: boolean,
+      subtask?: boolean,
       description?: string,
       iconPath: string,
       iconUrl: string,
@@ -1309,7 +1320,7 @@ declare module 'luna' {
       descriptionField: MetaIssueField,
       priorityField: MetaIssueField,
       labelField: MetaIssueField,
-      subTaskTypes: Array<IssueType>,
+      subtaskTypes: Array<IssueType>,
       customActions: Array<WebNode>,
   }
   export interface WebNode {

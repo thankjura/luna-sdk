@@ -14,6 +14,8 @@ export default defineConfig({
         'axios': 'axios',
         'I18N': 'I18N',
         'sortablejs': 'Sortable',
+        'chart.js': 'ChartJs',
+        'vue-router': 'VueRouter',
       }
     }),
     vue()
