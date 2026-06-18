@@ -39,7 +39,7 @@ public class DataBaseConfig {
     }
 
     public String getDbUri() {
-        return String.format("postgresql://%s:%s@%s:%s/%s", username, password, host, port, database);
+        return String.format("postgresql:/%s:%s/%s?user=%s&password=%s", host, port, database, username, password);
     }
 
     public String getHost() {
