@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ResponseError } from "luna";
 
 // /rest/plugin/<plugin key>
 export const baseURL = '/rest/plugin/ru.slie.luna.template.demo-addon';

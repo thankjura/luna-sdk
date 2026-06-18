@@ -3,8 +3,8 @@ package ru.slie.luna.sdk;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import ru.slie.luna.sdk.command.CompletionCommand;
-import ru.slie.luna.sdk.command.ProjectGenerateCommand;
-import ru.slie.luna.sdk.command.ProjectPackageCommand;
+import ru.slie.luna.sdk.command.CreateCommand;
+import ru.slie.luna.sdk.command.PackageCommand;
 import ru.slie.luna.sdk.command.RunCommand;
 
 
@@ -12,8 +12,8 @@ import ru.slie.luna.sdk.command.RunCommand;
         mixinStandardHelpOptions = true,
         subcommands = {
             CompletionCommand.class,
-            ProjectGenerateCommand.class,
-            ProjectPackageCommand.class,
+            CreateCommand.class,
+            PackageCommand.class,
             RunCommand.class
         },
         resourceBundle = "messages")

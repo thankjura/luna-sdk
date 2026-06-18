@@ -41,7 +41,7 @@ public class RunCommand implements Runnable {
 
     @Override
     public void run() {
-        new ProjectPackageCommand().run();
+        new PackageCommand().run();
         Path currentDirPath = Paths.get("").toAbsolutePath();
         new ProjectUtils().checkProjectRoot(currentDirPath);
         Path sdkHome = Path.of(System.getProperty("luna.sdk.home"));

@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @CommandLine.Command(name = "package", description = "${command.package.description}", mixinStandardHelpOptions = true)
-public class ProjectPackageCommand implements Runnable {
+public class PackageCommand implements Runnable {
     private final Logger log = LoggerFactory.getLogger("luna-sdk");
     private final Logger mavenLog = LoggerFactory.getLogger("maven");
     I18nResolver i18n = new I18nResolver();
