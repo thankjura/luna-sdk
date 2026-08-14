@@ -47,7 +47,7 @@ public class TodoRest {
     }
 
     @PatchMapping("/{cardId}")
-    public Card patchCard(@PathVariable("cardId") Long cardId, @RequestBody Map<String, String> request) throws ValidateException {
+    public Card patchCard(@PathVariable Long cardId, @RequestBody Map<String, String> request) throws ValidateException {
         Card card = cardManager.getCardById(cardId).orElse(null);
         if (card == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

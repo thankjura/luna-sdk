@@ -93,7 +93,7 @@ declare module 'luna' {
       maxWidth?: number
       zIndex?: number
       group?: string
-      options: DropDownOption[]
+      options: DropDownGroupOption[]
     }, {}, {}, SlotsType<{}>>;
   export const DropDownButton: DefineComponent<
     {},{
@@ -962,6 +962,12 @@ declare module 'luna' {
       LARGE = "128x128",
       X_LARGE = "256x256",
   }
+  export interface DropDownGroupOption {
+      id: string|number,
+      label?: string;
+      options: Array<DropDownOption>;
+      className?: string,
+  }
   export interface DropDownOption {
       id: string|number,
       label: string;
@@ -976,12 +982,6 @@ declare module 'luna' {
       className?: string,
       title?: string,
       selected?: boolean,
-  }
-  export interface DropDownGroupOption {
-      id: string|number,
-      label?: string;
-      options: Array<DropDownOption>;
-      className?: string,
   }
   export type OptionsGetterSync = () => DropDownGroupOption[]
   export type OptionsGetterAsync = () => Promise<DropDownGroupOption[]>
