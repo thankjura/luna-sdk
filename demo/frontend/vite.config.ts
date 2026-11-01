@@ -11,6 +11,7 @@ export default defineConfig({
       externals: {
         'luna': '__LUNA_COMPONENTS__',
         'vue': 'Vue',
+        'luxon': 'Luxon',
         'axios': 'axios',
         'I18N': 'I18N',
         'sortablejs': 'Sortable',
