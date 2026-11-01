@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
-import { onBeforeUnmount, onMounted, PropType, useTemplateRef } from "vue";
-import { Card } from "@/interfaces/card.ts";
+import { onBeforeUnmount, onMounted, type PropType, useTemplateRef } from "vue";
+import type { Card } from "@/interfaces/card";
 import CardComponent from "@/components/CardComponent.vue";
-import Sortable, { SortableEvent } from "sortablejs";
+import Sortable, { type SortableEvent } from "sortablejs";
 
 const props = defineProps({
   cards: Array as PropType<Array<Card>>,

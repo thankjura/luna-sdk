@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>ru.slie.luna</groupId>
   <artifactId>luna-sdk</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 
   <packaging>pom</packaging>
 
@@ -14,7 +14,7 @@
   </modules>
 
   <properties>
-    <luna.version>3.0.0</luna.version>
+    <luna.version>4.0.0-SNAPSHOT</luna.version>
     <apache.maven.version>3.9.12</apache.maven.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>

@@ -22,7 +22,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'src'),
+      '@': resolve(import.meta.dirname, 'src'),
     }
   },
   build: {
@@ -30,8 +30,8 @@ export default defineConfig({
     minify: 'terser',
     lib: {
       entry: [
-      	resolve(__dirname, 'src/views/DemoView.vue'),
-        resolve(__dirname, 'src/views/TodoView.vue'),
+      	resolve(import.meta.dirname, 'src/views/DemoView.vue'),
+        resolve(import.meta.dirname, 'src/views/TodoView.vue'),
       ],
       formats: ['es'],
     },
@@ -41,7 +41,7 @@ export default defineConfig({
         exports: 'named',
       },
     },
-    outDir: resolve(__dirname, '../src/main/resources/frontend'),
+    outDir: resolve(import.meta.dirname, '../src/main/resources/frontend'),
     emptyOutDir: true,
   },
 })

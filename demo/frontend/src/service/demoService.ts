@@ -1,4 +1,4 @@
-import { client } from "@/utils/client.ts";
+import { client } from "@/utils/client";
 
 class DemoService {
   async getHello() {

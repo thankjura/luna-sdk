@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import { Errors, ButtonBusy, Injections } from 'luna';
-import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef } from "vue";
+import { type Errors, ButtonBusy, $notify } from 'luna';
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from "vue";
 import TodoColumnComponent from "@/components/TodoColumnComponent.vue";
-import { $i18n } from "@/utils/i18n.ts";
-import { todoService } from "@/service/todoService.ts";
-import { Card, CardState } from "@/interfaces/card.ts";
-import Sortable, { SortableEvent } from "sortablejs";
+import { $i18n } from "@/utils/i18n";
+import { todoService } from "@/service/todoService";
+import { type Card, CardState } from "@/interfaces/card";
+import Sortable, { type SortableEvent } from "sortablejs";
 
 const busy = ref(false);
-const $notify = inject(Injections.$notify);
 const cardValue = ref<string>(null);
 const cards = ref<Array<Card>>([]);
 const errors = ref<Errors>({});

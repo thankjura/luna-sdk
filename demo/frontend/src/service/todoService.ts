@@ -1,5 +1,5 @@
-import { client } from "@/utils/client.ts";
-import { Card } from "@/interfaces/card.ts";
+import { client } from "@/utils/client";
+import { type Card } from "@/interfaces/card";
 
 class TodoService {
   async getAllCards() {

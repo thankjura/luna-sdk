@@ -38,8 +38,11 @@ public class CardManager {
     }
 
     public Optional<Card> getCardById(Long cardId) {
-        Optional<CardEntity> entity = activeDocManager.getById(CardEntity.class, cardId);
-        return entity.map(Card::new);
+        CardEntity entity = activeDocManager.getById(CardEntity.class, cardId);
+        if (entity == null) {
+            return Optional.empty();
+        }
+        return Optional.of(new Card(entity));
 
     }
 
@@ -63,9 +66,9 @@ public class CardManager {
     }
 
     public DeleteResult delete(Long cardId) {
-        Optional<CardEntity> entity = activeDocManager.getById(CardEntity.class, cardId);
-        if (entity.isPresent()) {
-            activeDocManager.delete(entity.get());
+        CardEntity entity = activeDocManager.getById(CardEntity.class, cardId);
+        if (entity != null) {
+            activeDocManager.delete(entity);
             return new DeleteResult(1);
         }
 
