@@ -65,6 +65,15 @@ public class RunCommand implements Runnable {
     @CommandLine.Option(names = {"--reset"}, descriptionKey = "command.run.option.reset")
     private boolean reset = false;
 
+    @CommandLine.Option(names = {"-w", "--workdir"}, descriptionKey = "command.run.option.workdir", paramLabel = "DIR")
+    private Path workDir;
+
+    @CommandLine.Option(names = {"--luna-version"}, descriptionKey = "command.run.option.luna_version", paramLabel = "VERSION")
+    private String lunaVersionOption;
+
+    @CommandLine.Option(names = {"--no-plugin"}, descriptionKey = "command.run.option.no_plugin")
+    private boolean noPlugin = false;
+
     private final AtomicReference<InstalledLocalContainer> containerRef = new AtomicReference<>();
     private final AtomicReference<DataBaseProvider> dataBaseRef = new AtomicReference<>();
     private final AtomicBoolean tomcatStarted = new AtomicBoolean(false);
@@ -73,8 +82,11 @@ public class RunCommand implements Runnable {
 
     @Override
     public void run() {
-        Path projectDir = Paths.get("").toAbsolutePath();
-        new ProjectUtils().checkProjectRoot(projectDir);
+        Path currentDir = Paths.get("").toAbsolutePath();
+        boolean pluginMode = !noPlugin && new ProjectUtils().isPluginProject(currentDir);
+        if (!pluginMode && workDir == null) {
+            throw new CommandLine.PicocliException(i18n.getString("command.run.workdir_required"));
+        }
 
         String sdkHomeProperty = System.getProperty("luna.sdk.home");
         if (sdkHomeProperty == null || !Files.isDirectory(Path.of(sdkHomeProperty))) {
@@ -90,25 +102,20 @@ public class RunCommand implements Runnable {
             checkPortFree(debugPort);
         }
 
-        if (!noBuild) {
+        // Instance state (luna-home, database, tomcat) lives in --workdir or in the plugin target directory
+        Path stateDir = (workDir != null ? workDir : currentDir.resolve("target")).toAbsolutePath().normalize();
+        Path lunaHome = stateDir.resolve("luna-home");
+        Path databaseDir = stateDir.resolve("database");
+        // quick-reload watches the plugin build output, only in plugin mode
+        Path quickReloadDir = pluginMode ? currentDir.resolve("target") : null;
+        String lunaVersion = resolveLunaVersion(currentDir, pluginMode);
+
+        if (pluginMode && !noBuild) {
             new PackageCommand(offline).run();
         }
 
+        log.info(i18n.getString(pluginMode ? "command.run.mode.plugin" : "command.run.mode.standalone", stateDir.toString(), lunaVersion));
         log.info(i18n.getString("command.run.cargo.prepare_run"));
-
-        Path targetDir = projectDir.resolve("target");
-        Path lunaHome = targetDir.resolve("luna-home").toAbsolutePath();
-        Model model;
-        try {
-            model = getModel(projectDir);
-        } catch (Exception e) {
-            throw new CommandLine.PicocliException(e.getLocalizedMessage(), e);
-        }
-
-        String lunaVersion = model.getProperties().getProperty("luna.version");
-        if (lunaVersion == null) {
-            throw new CommandLine.PicocliException(i18n.getString("command.run.please_define_luna_version"));
-        }
 
         Path warPath = resolveLuna(lunaVersion);
         DataBaseConfig config;
@@ -121,34 +128,30 @@ public class RunCommand implements Runnable {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "luna-sdk-shutdown"));
 
         try {
-            // luna-home without a paired container database belongs to a lost database: start from scratch
-            boolean unpaired = config == null && !DataBaseProvider.isPaired(lunaHome);
-            if (reset || unpaired) {
-                if (Files.exists(lunaHome)) {
-                    log.info(i18n.getString("command.run.reset", lunaHome.toString()));
-                    TomcatInstaller.deleteRecursively(lunaHome);
-                }
+            if (reset) {
+                log.info(i18n.getString("command.run.reset", stateDir.toString()));
+                TomcatInstaller.deleteRecursively(lunaHome);
                 if (config == null) {
-                    DataBaseProvider.resetVolume(projectDir);
+                    TomcatInstaller.deleteRecursively(databaseDir);
                 }
             }
             Files.createDirectories(lunaHome);
             copyLicense(lunaHome);
             CargoUtils.installSdkPlugins(sdkHome.resolve("plugins"), lunaHome);
-            Path tomcatHome = TomcatInstaller.install(targetDir, offline);
+            Path tomcatHome = TomcatInstaller.install(stateDir, offline);
 
-            DataBaseProvider dataBaseProvider = new DataBaseProvider(projectDir, targetDir, lunaHome, config);
+            DataBaseProvider dataBaseProvider = new DataBaseProvider(stateDir, databaseDir, config);
             dataBaseRef.set(dataBaseProvider);
             config = dataBaseProvider.getConfig();
             log.info(i18n.getString("command.run.database.run", config.getDisplayUri()));
             Files.writeString(lunaHome.resolve("database.yml"), config.toYamlConfig());
 
             log.info(i18n.getString("command.run.cargo.run"));
-            InstalledLocalContainer container = CargoUtils.makeContainer(targetDir, tomcatHome, warPath, jvmArgs, host, port,
-                                                                         debugPort, Duration.ofSeconds(timeoutSeconds).toMillis());
+            InstalledLocalContainer container = CargoUtils.makeContainer(stateDir, lunaHome, quickReloadDir, tomcatHome, warPath,
+                                                                         jvmArgs, host, port, debugPort, Duration.ofSeconds(timeoutSeconds).toMillis());
             containerRef.set(container);
 
-            Path outputLog = CargoUtils.getOutputLog(targetDir);
+            Path outputLog = CargoUtils.getOutputLog(stateDir);
             Files.deleteIfExists(outputLog);
             if (attach) {
                 attachOutput(outputLog);
@@ -170,6 +173,26 @@ public class RunCommand implements Runnable {
         }
 
         waitForTomcatExit();
+    }
+
+    private String resolveLunaVersion(Path projectDir, boolean pluginMode) {
+        if (lunaVersionOption != null && !lunaVersionOption.isBlank()) {
+            return lunaVersionOption;
+        }
+        if (!pluginMode) {
+            return SdkProperties.get("luna.version");
+        }
+        Model model;
+        try {
+            model = getModel(projectDir);
+        } catch (Exception e) {
+            throw new CommandLine.PicocliException(e.getLocalizedMessage(), e);
+        }
+        String version = model.getProperties().getProperty("luna.version");
+        if (version == null) {
+            throw new CommandLine.PicocliException(i18n.getString("command.run.please_define_luna_version"));
+        }
+        return version;
     }
 
     private Path resolveLuna(String lunaVersion) {
@@ -202,7 +225,9 @@ public class RunCommand implements Runnable {
 
     private void checkPortFree(int portToCheck) {
         try (ServerSocket socket = new ServerSocket()) {
-            socket.setReuseAddress(false);
+            // as Tomcat does: connections left in TIME_WAIT by clients must not make a free port look busy,
+            // a port someone listens on still fails to bind
+            socket.setReuseAddress(true);
             socket.bind(new InetSocketAddress(host, portToCheck));
         } catch (IOException e) {
             throw new CommandLine.PicocliException(i18n.getString("command.run.port_busy", String.format("%s:%d", host, portToCheck)));

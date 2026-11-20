@@ -6,6 +6,7 @@ import ru.slie.luna.sdk.command.CompletionCommand;
 import ru.slie.luna.sdk.command.CreateCommand;
 import ru.slie.luna.sdk.command.PackageCommand;
 import ru.slie.luna.sdk.command.RunCommand;
+import ru.slie.luna.sdk.utils.SdkProperties;
 
 
 @Command(name = "luna-sdk",
@@ -19,6 +20,8 @@ import ru.slie.luna.sdk.command.RunCommand;
         resourceBundle = "messages")
 public class LunaCliMain implements Runnable {
     public static void main(String[] args) {
+        // Used in option descriptions
+        System.setProperty("sdk.luna.version", SdkProperties.get("luna.version"));
         CommandLine cmd = new CommandLine(new LunaCliMain()).setStopAtPositional(false).setAllowOptionsAsOptionParameters(true);
         cmd.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
             if (ex instanceof CommandLine.PicocliException) {

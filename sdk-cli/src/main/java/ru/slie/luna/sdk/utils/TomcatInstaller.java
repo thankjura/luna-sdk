@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Enumeration;
-import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -22,32 +21,15 @@ import java.util.zip.ZipFile;
 public class TomcatInstaller {
     private static final Logger log = LoggerFactory.getLogger("installer");
     private static final I18nResolver i18n = new I18nResolver();
-    private static final String SDK_PROPERTIES = "luna-sdk.properties";
 
     private TomcatInstaller() {
-    }
-
-    public static String getTomcatVersion() {
-        Properties properties = new Properties();
-        try (InputStream is = TomcatInstaller.class.getClassLoader().getResourceAsStream(SDK_PROPERTIES)) {
-            if (is != null) {
-                properties.load(is);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        String version = properties.getProperty("tomcat.version");
-        if (version == null || version.isBlank() || version.startsWith("${")) {
-            throw new IllegalStateException("tomcat.version is not defined in " + SDK_PROPERTIES);
-        }
-        return version;
     }
 
     /**
      * @return Tomcat home directory
      */
     public static Path install(Path targetDir, boolean offline) throws IOException {
-        String version = getTomcatVersion();
+        String version = SdkProperties.get("tomcat.version");
         Path home = targetDir.resolve("apache-tomcat-" + version);
 
         if (Files.isRegularFile(home.resolve("lib").resolve("catalina.jar"))) {

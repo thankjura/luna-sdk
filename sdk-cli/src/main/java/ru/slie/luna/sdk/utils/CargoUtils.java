@@ -27,18 +27,24 @@ public class CargoUtils {
     private CargoUtils() {
     }
 
-    public static Path getOutputLog(Path targetDir) {
-        return targetDir.resolve("tomcat-base").resolve("logs").resolve("application.log");
+    public static Path getOutputLog(Path stateDir) {
+        return stateDir.resolve("tomcat-base").resolve("logs").resolve("application.log");
     }
 
-    public static InstalledLocalContainer makeContainer(Path targetDir, Path tomcatHome, Path warPath, String jvmArgs,
-                                                        String host, int port, Integer debugPort, long timeoutMs) {
-        Tomcat11xStandaloneLocalConfiguration configuration = new Tomcat11xStandaloneLocalConfiguration(targetDir.resolve("tomcat-base").toString());
+    /**
+     * @param quickReloadDir plugin build directory watched by quick-reload, {@code null} to run without a plugin
+     */
+    public static InstalledLocalContainer makeContainer(Path stateDir, Path lunaHome, Path quickReloadDir, Path tomcatHome,
+                                                        Path warPath, String jvmArgs, String host, int port,
+                                                        Integer debugPort, long timeoutMs) {
+        Tomcat11xStandaloneLocalConfiguration configuration = new Tomcat11xStandaloneLocalConfiguration(stateDir.resolve("tomcat-base").toString());
         configuration.setProperty(ServletPropertySet.PORT, String.valueOf(port));
         configuration.setProperty(GeneralPropertySet.HOSTNAME, host);
 
-        StringBuilder args = new StringBuilder()
-                .append(String.format("-Dluna.home=\"%s\" -Dquickreload.dir=\"%s\"", targetDir.resolve("luna-home"), targetDir));
+        StringBuilder args = new StringBuilder(String.format("-Dluna.home=\"%s\"", lunaHome));
+        if (quickReloadDir != null) {
+            args.append(String.format(" -Dquickreload.dir=\"%s\"", quickReloadDir));
+        }
         if (debugPort != null) {
             args.append(String.format(" -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s:%d", host, debugPort));
         }
@@ -56,7 +62,7 @@ public class CargoUtils {
         log.info(i18n.getString("cargo.installer.home", tomcatHome.toString()));
         container.setHome(tomcatHome.toString());
         container.setTimeout(timeoutMs);
-        container.setOutput(getOutputLog(targetDir).toString());
+        container.setOutput(getOutputLog(stateDir).toString());
         return container;
     }
 

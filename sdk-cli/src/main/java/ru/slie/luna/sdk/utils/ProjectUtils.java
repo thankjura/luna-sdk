@@ -17,17 +17,15 @@ public class ProjectUtils {
     I18nResolver i18n = new I18nResolver();
     List<String> YAML_CONFIG = Arrays.asList("luna-plugin.yaml", "luna-plugin.yml");
 
+    public boolean isPluginProject(Path path) {
+        return Files.isRegularFile(path.resolve("pom.xml"))
+                && YAML_CONFIG.stream().anyMatch(f -> Files.isRegularFile(path.resolve("src").resolve("main").resolve("resources").resolve(f)));
+    }
+
     public void checkProjectRoot(Path path) {
-        Path pomPath = path.resolve("pom.xml");
-        if (!Files.isRegularFile(pomPath)) {
+        if (!isPluginProject(path)) {
             throw new CommandLine.PicocliException(i18n.getString("project.error.is_not_plugin_directory"));
         }
-
-        if (YAML_CONFIG.stream().anyMatch(f -> Files.isRegularFile(path.resolve("src").resolve("main").resolve("resources").resolve(f)))) {
-            return;
-        }
-
-        throw new CommandLine.PicocliException(i18n.getString("project.error.is_not_plugin_directory"));
     }
 
     public static Model getModel(Path projectDir) throws IOException, XmlPullParserException {
