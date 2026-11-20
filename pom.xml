@@ -16,6 +16,7 @@
   <properties>
     <luna.version>4.0.0-SNAPSHOT</luna.version>
     <apache.maven.version>3.9.12</apache.maven.version>
+        <tomcat.version>11.0.22</tomcat.version>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

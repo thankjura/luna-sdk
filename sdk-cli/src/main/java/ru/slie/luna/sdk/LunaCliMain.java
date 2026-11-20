@@ -20,6 +20,14 @@ import ru.slie.luna.sdk.command.RunCommand;
 public class LunaCliMain implements Runnable {
     public static void main(String[] args) {
         CommandLine cmd = new CommandLine(new LunaCliMain()).setStopAtPositional(false).setAllowOptionsAsOptionParameters(true);
+        cmd.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
+            if (ex instanceof CommandLine.PicocliException) {
+                // Expected failures: print the message only, the stack trace is noise for the user
+                commandLine.getErr().println(commandLine.getColorScheme().errorText(ex.getMessage()));
+                return commandLine.getCommandSpec().exitCodeOnExecutionException();
+            }
+            throw ex;
+        });
         int exitCode = cmd.execute(args);
         System.exit(exitCode);
     }

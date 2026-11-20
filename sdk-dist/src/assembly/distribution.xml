@@ -17,15 +17,19 @@
             <fileMode>0755</fileMode>
             <filtered>true</filtered>
         </fileSet>
-    </fileSets>
-    <files>
-        <file>
-            <source>../quick-reload/target/quick-reload-1.0.2.jar</source>
+        <fileSet>
+            <directory>${project.basedir}/../quick-reload/target</directory>
             <outputDirectory>plugins</outputDirectory>
-            <destName>quick-reload-1.0.2.jar</destName>
+            <includes>
+                <include>quick-reload-*.jar</include>
+            </includes>
+            <excludes>
+                <exclude>*-sources.jar</exclude>
+                <exclude>*-javadoc.jar</exclude>
+            </excludes>
             <fileMode>0644</fileMode>
-        </file>
-    </files>
+        </fileSet>
+    </fileSets>
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>

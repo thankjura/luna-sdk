@@ -17,6 +17,16 @@ public class PackageCommand implements Runnable {
     private final Logger mavenLog = LoggerFactory.getLogger("maven");
     I18nResolver i18n = new I18nResolver();
 
+    @CommandLine.Option(names = {"-o", "--offline"}, descriptionKey = "command.option.offline")
+    private boolean offline = false;
+
+    public PackageCommand() {
+    }
+
+    public PackageCommand(boolean offline) {
+        this.offline = offline;
+    }
+
     @Override
     public void run() {
         log.info(i18n.getString("command.package.build"));
@@ -31,7 +41,8 @@ public class PackageCommand implements Runnable {
         }
         request.addArg("package");
         request.setBatchMode(true);
-        request.setUpdateSnapshots(true);
+        request.setOffline(offline);
+        request.setUpdateSnapshots(!offline);
         request.setOutputHandler(line -> mavenLog.info("[maven] - {}", line));
         request.setErrorHandler(line -> mavenLog.error("[maven] - {}", line));
 
@@ -39,10 +50,10 @@ public class PackageCommand implements Runnable {
         try {
             InvocationResult result = invoker.execute(request);
             if (result.getExitCode() != 0) {
-                throw new RuntimeException(result.getExecutionException());
+                throw new CommandLine.PicocliException(i18n.getString("command.package.build.failed"), result.getExecutionException());
             }
         } catch (MavenInvocationException e) {
-            throw new RuntimeException(e);
+            throw new CommandLine.PicocliException(e.getLocalizedMessage(), e);
         }
 
         log.info(i18n.getString("command.package.build.successful"));

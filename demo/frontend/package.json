@@ -8,17 +8,17 @@
     "build": "vue-tsc --build && vite build",
     "i18n": "ts-node generateI18nStrings.ts"
   },
-  "dependencies": {},
   "devDependencies": {
-    "axios": "^1.21.0",
-    "sortablejs": "^1.15.7",
-    "vue": "^3.5.44",
+    "@types/node": "^24.19.2",
     "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-vue": "^6.0.10",
     "@vue/tsconfig": "^0.9.1",
+    "axios": "^1.21.0",
+    "sortablejs": "^1.15.7",
+    "terser": "^5.51.2",
     "typescript": "~6.0.3",
     "vite": "^8.3.5",
-    "terser": "^5.51.2",
+    "vue": "^3.5.44",
     "vue-component-type-helpers": "^3.3.14",
     "vue-tsc": "^3.3.14"
   }

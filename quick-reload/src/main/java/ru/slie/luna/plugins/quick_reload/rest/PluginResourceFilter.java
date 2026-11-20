@@ -10,10 +10,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import ru.slie.luna.plugins.quick_reload.ResourceMapper;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Map;
 
 @Component
 @Order(10)
@@ -29,36 +32,41 @@ public class PluginResourceFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         String uri = request.getRequestURI();
 
-        for (String prefix: resourceMapper.getReplaces().keySet()) {
-            if (uri.startsWith(prefix)) {
-                Path path = Path.of(uri.replaceFirst(prefix, resourceMapper.getReplaces().get(prefix).toString()));
-                if (!Files.isRegularFile(path)) {
-                    response.sendError(404);
-                    return;
-                }
+        for (Map.Entry<String, Path> replace : resourceMapper.getReplaces().entrySet()) {
+            String prefix = replace.getKey();
+            if (!uri.startsWith(prefix + "/")) {
+                continue;
+            }
 
-                String mime = URLConnection.guessContentTypeFromName(uri);
-                if (mime == null) {
-                    mime = "application/octet-stream";
-                }
-                MediaType contentType = MediaType.parseMediaType(mime);
-
-                response.setContentType(contentType.toString());
-                response.setStatus(200);
-
-                File file = path.toFile();
-                response.setContentLengthLong(file.length());
-
-                try (InputStream in = new FileInputStream(file); OutputStream out = response.getOutputStream()) {
-                    byte[] buffer = new byte[4096];
-                    int bytesRead;
-                    while ((bytesRead = in.read(buffer)) != -1) {
-                        out.write(buffer, 0, bytesRead);
-                    }
-                    out.flush();
-                }
+            Path root = replace.getValue().toAbsolutePath().normalize();
+            // Resolve as a path, not as a regex replacement: Windows paths contain backslashes,
+            // and ".." must not escape the resources directory
+            Path path;
+            try {
+                path = root.resolve(uri.substring(prefix.length() + 1)).normalize();
+            } catch (InvalidPathException e) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
+            if (!path.startsWith(root) || !Files.isRegularFile(path)) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            String mime = URLConnection.guessContentTypeFromName(path.getFileName().toString());
+            if (mime == null) {
+                mime = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+
+            response.setContentType(MediaType.parseMediaType(mime).toString());
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentLengthLong(Files.size(path));
+
+            try (OutputStream out = response.getOutputStream()) {
+                Files.copy(path, out);
+                out.flush();
+            }
+            return;
         }
     }
 }

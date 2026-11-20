@@ -3,6 +3,10 @@ package ru.slie.luna.sdk.utils;
 import org.postgresql.Driver;
 import org.postgresql.PGProperty;
 
+import tools.jackson.dataformat.yaml.YAMLMapper;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class DataBaseConfig {
@@ -38,8 +42,11 @@ public class DataBaseConfig {
         }
     }
 
-    public String getDbUri() {
-        return String.format("postgresql:/%s:%s/%s?user=%s&password=%s", host, port, database, username, password);
+    /**
+     * JDBC uri without password, safe for logging.
+     */
+    public String getDisplayUri() {
+        return String.format("jdbc:postgresql://%s:%s/%s?user=%s", host, port, database, username);
     }
 
     public String getHost() {
@@ -83,10 +90,12 @@ public class DataBaseConfig {
     }
 
     public String toYamlConfig() {
-        return "host: " + host + "\n" +
-               "port: " + port + "\n" +
-               "username: " + username + "\n" +
-               "password: " + password + "\n" +
-               "database: " + database + "\n";
+        Map<String, Object> values = new LinkedHashMap<>();
+        values.put("host", host);
+        values.put("port", port);
+        values.put("username", username);
+        values.put("password", password == null ? "" : password);
+        values.put("database", database);
+        return new YAMLMapper().writeValueAsString(values);
     }
 }

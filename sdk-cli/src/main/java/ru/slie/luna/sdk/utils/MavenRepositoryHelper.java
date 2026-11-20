@@ -35,14 +35,21 @@ public class MavenRepositoryHelper {
         return Paths.get(System.getProperty("user.home"), ".m2", "repository");
     }
 
-    public static ArtifactResult getArtifact(Artifact artifact) throws ArtifactResolutionException {
+    private static final String MAVEN_CENTRAL_URL = "https://repo1.maven.org/maven2/";
+
+    /**
+     * Resolves an artifact from the local repository first, then from Maven Central.
+     * Locally installed SNAPSHOT versions (mvn install) are resolved from the local repository.
+     */
+    public static ArtifactResult getArtifact(Artifact artifact, boolean offline) throws ArtifactResolutionException {
         RepositorySystem system = new RepositorySystemSupplier().get();
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        session.setOffline(offline);
 
         Path localRepoPath = getLocalRepositoryPath();
         LocalRepository localRepo = new LocalRepository(localRepoPath.toFile());
         session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-        RemoteRepository central = new RemoteRepository.Builder("central", "default", "https://repo1.maven.org").build();
+        RemoteRepository central = new RemoteRepository.Builder("central", "default", MAVEN_CENTRAL_URL).build();
         ArtifactRequest request = new ArtifactRequest();
         request.setArtifact(artifact);
         request.addRepository(central);
