@@ -19,7 +19,9 @@ import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -74,6 +76,15 @@ public class RunCommand implements Runnable {
     @CommandLine.Option(names = {"--no-plugin"}, descriptionKey = "command.run.option.no_plugin")
     private boolean noPlugin = false;
 
+    @CommandLine.Option(names = {"--cluster"}, descriptionKey = "command.run.option.cluster")
+    private boolean cluster = false;
+
+    @CommandLine.Option(names = {"--shared-home"}, descriptionKey = "command.run.option.shared_home", paramLabel = "DIR")
+    private Path sharedHome;
+
+    @CommandLine.Option(names = {"--node-id"}, descriptionKey = "command.run.option.node_id", paramLabel = "ID")
+    private String nodeId;
+
     private final AtomicReference<InstalledLocalContainer> containerRef = new AtomicReference<>();
     private final AtomicReference<DataBaseProvider> dataBaseRef = new AtomicReference<>();
     private final AtomicBoolean tomcatStarted = new AtomicBoolean(false);
@@ -96,6 +107,10 @@ public class RunCommand implements Runnable {
 
         if (host == null || host.isBlank()) {
             host = "localhost";
+        }
+        if (cluster && dbUri == null) {
+            // a database container belongs to one instance: nodes of a cluster must share one database
+            throw new CommandLine.PicocliException(i18n.getString("command.run.cluster_db_required"));
         }
         checkPortFree(port);
         if (debugPort != null) {
@@ -137,18 +152,36 @@ public class RunCommand implements Runnable {
             }
             Files.createDirectories(lunaHome);
             copyLicense(lunaHome);
-            CargoUtils.installSdkPlugins(sdkHome.resolve("plugins"), lunaHome);
+            Path shared = sharedHome != null ? sharedHome.toAbsolutePath().normalize() : null;
+            if (shared != null) {
+                Files.createDirectories(shared);
+            }
+            CargoUtils.installSdkPlugins(sdkHome.resolve("plugins"), pluginsHome(lunaHome, shared, lunaVersion), lunaHome);
             Path tomcatHome = TomcatInstaller.install(stateDir, offline);
 
             DataBaseProvider dataBaseProvider = new DataBaseProvider(stateDir, databaseDir, config);
             dataBaseRef.set(dataBaseProvider);
             config = dataBaseProvider.getConfig();
             log.info(i18n.getString("command.run.database.run", config.getDisplayUri()));
-            Files.writeString(lunaHome.resolve("database.yml"), config.toYamlConfig());
+            Path databaseYml = lunaHome.resolve("database.yml");
+            Files.writeString(databaseYml, config.toYamlConfig(Files.exists(databaseYml) ? Files.readString(databaseYml) : null));
 
             log.info(i18n.getString("command.run.cargo.run"));
+            Map<String, String> properties = new LinkedHashMap<>();
+            if (cluster) {
+                properties.put("luna.cluster", "true");
+                log.info(i18n.getString("command.run.cluster", nodeId != null ? nodeId : "-",
+                        shared != null ? shared.toString() : lunaHome.resolve("shared").toString()));
+            }
+            if (shared != null) {
+                properties.put("luna.shared.home", shared.toString());
+            }
+            if (nodeId != null && !nodeId.isBlank()) {
+                properties.put("luna.node.id", nodeId);
+            }
             InstalledLocalContainer container = CargoUtils.makeContainer(stateDir, lunaHome, quickReloadDir, tomcatHome, warPath,
-                                                                         jvmArgs, host, port, debugPort, Duration.ofSeconds(timeoutSeconds).toMillis());
+                                                                         jvmArgs, properties, host, port, debugPort,
+                                                                         Duration.ofSeconds(timeoutSeconds).toMillis());
             containerRef.set(container);
 
             Path outputLog = CargoUtils.getOutputLog(stateDir);
@@ -173,6 +206,25 @@ public class RunCommand implements Runnable {
         }
 
         waitForTomcatExit();
+    }
+
+    /**
+     * Home that holds installed plugins: Luna 4 keeps them in the shared home ({@code luna-home/shared} unless
+     * {@code --shared-home} is given), older versions in luna-home.
+     */
+    static Path pluginsHome(Path lunaHome, Path sharedHome, String lunaVersion) {
+        if (sharedHome != null) {
+            return sharedHome;
+        }
+        return majorVersion(lunaVersion) >= 4 ? lunaHome.resolve("shared") : lunaHome;
+    }
+
+    static int majorVersion(String version) {
+        if (version == null) {
+            return 0;
+        }
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("^(\\d+)").matcher(version.trim());
+        return matcher.find() ? Integer.parseInt(matcher.group(1)) : 0;
     }
 
     private String resolveLunaVersion(Path projectDir, boolean pluginMode) {

@@ -5,6 +5,7 @@ import org.codehaus.cargo.container.deployable.WAR;
 import org.codehaus.cargo.container.property.GeneralPropertySet;
 import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.container.tomcat.Tomcat11xInstalledLocalContainer;
+import org.codehaus.cargo.container.tomcat.TomcatPropertySet;
 import org.codehaus.cargo.container.tomcat.Tomcat11xStandaloneLocalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -35,16 +37,21 @@ public class CargoUtils {
      * @param quickReloadDir plugin build directory watched by quick-reload, {@code null} to run without a plugin
      */
     public static InstalledLocalContainer makeContainer(Path stateDir, Path lunaHome, Path quickReloadDir, Path tomcatHome,
-                                                        Path warPath, String jvmArgs, String host, int port,
-                                                        Integer debugPort, long timeoutMs) {
+                                                        Path warPath, String jvmArgs, Map<String, String> systemProperties,
+                                                        String host, int port, Integer debugPort, long timeoutMs) {
         Tomcat11xStandaloneLocalConfiguration configuration = new Tomcat11xStandaloneLocalConfiguration(stateDir.resolve("tomcat-base").toString());
         configuration.setProperty(ServletPropertySet.PORT, String.valueOf(port));
+        // shutdown and AJP ports follow the HTTP port, so instances with different --port can run side by side;
+        // the default port 7080 keeps the Cargo defaults 8205 and 8009
+        configuration.setProperty(GeneralPropertySet.RMI_PORT, String.valueOf(port + 1125));
+        configuration.setProperty(TomcatPropertySet.AJP_PORT, String.valueOf(port + 929));
         configuration.setProperty(GeneralPropertySet.HOSTNAME, host);
 
         StringBuilder args = new StringBuilder(String.format("-Dluna.home=\"%s\"", lunaHome));
         if (quickReloadDir != null) {
             args.append(String.format(" -Dquickreload.dir=\"%s\"", quickReloadDir));
         }
+        systemProperties.forEach((key, value) -> args.append(String.format(" -D%s=\"%s\"", key, value)));
         if (debugPort != null) {
             args.append(String.format(" -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=%s:%d", host, debugPort));
         }
@@ -67,11 +74,15 @@ public class CargoUtils {
     }
 
     /**
-     * Copies SDK bundled plugins (quick-reload, ...) into luna-home and removes the ones copied by
-     * a previous SDK version, so an SDK upgrade does not leave two versions of the same plugin installed.
+     * Copies SDK bundled plugins (quick-reload, ...) into {@code <pluginsHome>/plugins/installed} and removes the
+     * ones copied by a previous SDK version, so an SDK upgrade does not leave two versions of the same plugin
+     * installed.
+     *
+     * @param pluginsHome the home that holds installed plugins (the shared home of Luna 4)
+     * @param lunaHome    the home of this instance, keeps the list of copied plugins
      */
-    public static void installSdkPlugins(Path pluginsDir, Path lunaHome) throws IOException {
-        Path installedDir = lunaHome.resolve("plugins").resolve("installed");
+    public static void installSdkPlugins(Path pluginsDir, Path pluginsHome, Path lunaHome) throws IOException {
+        Path installedDir = pluginsHome.resolve("plugins").resolve("installed");
         Path manifest = lunaHome.resolve(SDK_PLUGINS_MANIFEST);
         Files.createDirectories(installedDir);
 

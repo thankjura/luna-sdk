@@ -89,13 +89,31 @@ public class DataBaseConfig {
         this.database = database;
     }
 
-    public String toYamlConfig() {
+    /**
+     * database.yml with the connection of this config. Other settings of an existing file (maximumPoolSize,
+     * timeouts, showSql) are kept, so they can be tuned in luna-home between runs.
+     *
+     * @param existing current content of database.yml, null if there is none
+     */
+    @SuppressWarnings("unchecked")
+    public String toYamlConfig(String existing) {
+        YAMLMapper mapper = new YAMLMapper();
         Map<String, Object> values = new LinkedHashMap<>();
+        if (existing != null && !existing.isBlank()) {
+            try {
+                Object parsed = mapper.readValue(existing, Map.class);
+                if (parsed instanceof Map<?, ?> map) {
+                    values.putAll((Map<String, Object>) map);
+                }
+            } catch (RuntimeException ignored) {
+                // broken file: rewrite it with the connection only
+            }
+        }
         values.put("host", host);
         values.put("port", port);
         values.put("username", username);
         values.put("password", password == null ? "" : password);
         values.put("database", database);
-        return new YAMLMapper().writeValueAsString(values);
+        return mapper.writeValueAsString(values);
     }
 }
